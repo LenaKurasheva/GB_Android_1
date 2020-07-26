@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Погода</string>
+    <string name="little_cloudy">Малооблачно</string>
+    <string name="night">Ночь</string>
+    <string name="plus_16">+16°</string>
+    <string name="city">Город</string>
+</resources>

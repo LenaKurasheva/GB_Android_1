@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">GB_Android_1</string>
+    <string name="app_name">Weather</string>
+    <string name="little_cloudy">Little cloudy</string>
+    <string name="night">Night</string>
+    <string name="plus_16">+16°</string>
+    <string name="city">City</string>
 </resources>
