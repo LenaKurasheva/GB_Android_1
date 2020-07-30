@@ -8,13 +8,9 @@
     android:background="@color/day"
     android:id="@+id/full_screen_constraintlayout">
 
-
-    <!-- Helloworld, расположенный посередине; для удобства расположения элементов на экране -->
-
-    <!-- Здесь планируется сделать список следующих 10-ти дней с отображением погоды -->
-
+    <!-- Center, расположенный посередине; для удобства расположения элементов на экране -->
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -23,8 +19,9 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.788"
-        tools:text="Hello World!" />
+        tools:text="Center" />
 
+    <!-- Здесь планируется сделать список следующих 10-ти дней с отображением погоды -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dayList"
         android:layout_width="match_parent"
@@ -32,18 +29,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="match_parent"
-        android:layout_height="354dp"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toBottomOf="@+id/center" />
 
         <ImageView
             android:id="@+id/weatherStatus"
@@ -51,19 +37,18 @@
             android:layout_height="wrap_content"
             android:src="@drawable/cloudy"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toTopOf="@id/center"
+            app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
         <ImageButton
             android:id="@+id/settingsBottom"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginBottom="3dp"
+            android:layout_marginStart="200dp"
+            android:layout_marginBottom="10dp"
             android:background="@color/no_color"
             android:clickable="true"
             android:focusable="true"
@@ -72,9 +57,7 @@
             android:tint="@color/dark_grey"
             android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/city"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.891"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/city" />
 
         <TextView
             android:id="@+id/city"
@@ -95,9 +78,8 @@
             android:layout_marginBottom="40dp"
             android:text="@string/plus_16"
             android:textSize="72sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.481"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
@@ -106,7 +88,6 @@
             android:layout_height="wrap_content"
             android:text="@string/little_cloudy"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.49"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/degrees" />
 
@@ -114,15 +95,12 @@
             android:id="@+id/nightMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="150dp"
+            android:layout_marginBottom="10dp"
             android:text="@string/night"
             android:textColor="@color/dark_grey"
             android:textSize="10sp"
             app:layout_constraintBottom_toTopOf="@+id/city"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.086"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintEnd_toStartOf="@+id/city" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
