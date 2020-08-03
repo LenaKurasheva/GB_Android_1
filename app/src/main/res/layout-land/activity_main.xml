@@ -103,4 +103,14 @@
             app:layout_constraintBottom_toTopOf="@+id/city"
             app:layout_constraintEnd_toStartOf="@+id/city" />
 
+        <Button
+            android:id="@+id/increaseDegreesBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/make_it_warmer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cloudy" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

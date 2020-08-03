@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme">
 
 <!--        Для тестирования новой активити на эмуляторе, до реализации переключения между экранами, изменила атрибуты activity: -->
-        <activity android:name=".ChooseCityActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".ChooseCityActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
