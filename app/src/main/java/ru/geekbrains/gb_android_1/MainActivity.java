@@ -1,65 +1,92 @@
 package ru.geekbrains.gb_android_1;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private ImageButton settingsButton;
-    private TextView city;
+    private ImageButton settingsButton, locationButton, readMoreButton;
+    private TextView cityTextView;
     private TextView degrees;
-    private TextView cloudy;
-    private RecyclerView dayList;
-    private Switch nightMode;
-    private ImageView weatherStatus;
-    private ConstraintLayout fullscreenConstraint;
-    private static boolean isNightOn;
+    private TextView windInfoTextView, pressureInfoTextView;
+    private static String city = "City";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-        setOnBtnNight();
+        setOnSettingsBtnOnClick();
+        setOnLocationBtnOnClick();
+        showChosenCityFromChooseCityActivity();
+        showCheckedSwitches();
+        setOnReadMoreBtnOnClick();
     }
 
     private void initViews() {
-        dayList = findViewById(R.id.dayList);
         settingsButton = findViewById(R.id.settingsBottom);
-        city = findViewById(R.id.city);
+        locationButton = findViewById(R.id.locationButton);
+        cityTextView = findViewById(R.id.city);
         degrees = findViewById(R.id.degrees);
-        cloudy = findViewById(R.id.cloudy);
-        nightMode = findViewById(R.id.nightMode);
-        weatherStatus = findViewById(R.id.weatherStatus);
-        fullscreenConstraint = findViewById(R.id.full_screen_constraintlayout);
+        windInfoTextView = findViewById(R.id.windInfoTextView);
+        pressureInfoTextView = findViewById(R.id.pressureInfoTextView);
+        readMoreButton = findViewById(R.id.readMoreButton);
     }
 
-    private void setOnBtnNight() {
-        nightMode.setOnClickListener(new View.OnClickListener() {
+    private void setOnSettingsBtnOnClick() {
+        settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isNightOn){
-                    int backColor = ContextCompat.getColor(getApplicationContext(), R.color.day);
-                    int nightModeColor = ContextCompat.getColor(getApplicationContext(), R.color.dark_grey);
-                    fullscreenConstraint.setBackgroundColor(backColor);
-                    nightMode.setTextColor(nightModeColor);
-                    isNightOn = false;
-                } else {
-                    int backColor = ContextCompat.getColor(getApplicationContext(), R.color.night);
-                    int colorAccent = ContextCompat.getColor(getApplicationContext(), R.color.colorAccent);
-                    fullscreenConstraint.setBackgroundColor(backColor);
-                    isNightOn = true;
-                    nightMode.setTextColor(colorAccent);
-                }
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            finish();
+            }
+        });
+    }
+
+    private void setOnLocationBtnOnClick() {
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            Intent intent = new Intent(MainActivity.this, ChooseCityActivity.class);
+            startActivity(intent);
+            finish();
+            }
+        });
+    }
+
+    private void showChosenCityFromChooseCityActivity() {
+        String cityName = getIntent().getStringExtra(ChooseCityActivity.dataKey);
+        if (cityName != null) {
+            cityTextView.setText(cityName);
+            city = cityName;
+            return;
+        }
+        cityTextView.setText(city);
+    }
+
+    private void showCheckedSwitches(){
+        boolean[] settingsSwitchArray = getIntent().getBooleanArrayExtra(SettingsActivity.settingsDataKey);
+        if(settingsSwitchArray != null) {
+            if (settingsSwitchArray[0]) Toast.makeText(this, "NightMode is on", Toast.LENGTH_SHORT).show();
+            if (settingsSwitchArray[1]) windInfoTextView.setVisibility(View.VISIBLE);
+            if (settingsSwitchArray[2]) pressureInfoTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setOnReadMoreBtnOnClick() {
+        readMoreButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            String wiki = "https://ru.wikipedia.org/wiki/" + city;
+            Uri uri = Uri.parse(wiki);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
             }
         });
     }

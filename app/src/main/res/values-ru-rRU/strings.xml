@@ -12,6 +12,8 @@
     <string name="set_on_night_mode">Включить ночной режим</string>
     <string name="show_wind_speed">Показывать скорость ветра</string>
     <string name="show_atmosphere_pressure">Показывать атмосферное давление</string>
+    <string name="windInfo">4 м/с, С</string>
+    <string name="pressureInfo">758 мм рт.ст.</string>
     <string-array name="cities">
         <item>Москва</item>
         <item>Санкт-Петербург</item>
