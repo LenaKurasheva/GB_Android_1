@@ -39,13 +39,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/center"
         android:src="@drawable/cloudy"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        tools:ignore="ContentDescription" />
 
     <ImageButton
         android:id="@+id/settingsBottom"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="90dp"
+        android:layout_marginStart="120dp"
         android:layout_marginBottom="30dp"
         android:background="@color/no_color"
         android:clickable="true"
@@ -55,7 +56,8 @@
         android:tint="@color/dark_grey"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/city"
-        app:layout_constraintStart_toEndOf="@+id/city" />
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/city"
@@ -80,7 +82,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/cloudy"
+        android:id="@+id/cloudyInfoTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/little_cloudy"
@@ -88,16 +90,65 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/degrees" />
 
-    <Switch
-        android:id="@+id/nightMode"
+    <TextView
+        android:id="@+id/windInfoTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
+        android:visibility="invisible"
+        android:text="@string/windInfo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cloudyInfoTextView" />
+
+    <TextView
+        android:id="@+id/pressureInfoTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:text="@string/pressureInfo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/windInfoTextView" />
+
+    <ImageButton
+        android:id="@+id/locationButton"
+        android:layout_width="27dp"
+        android:layout_height="27dp"
+        android:layout_marginEnd="120dp"
         android:layout_marginBottom="30dp"
-        android:text="@string/night"
-        android:textColor="@color/dark_grey"
-        android:textSize="10sp"
+        android:background="@color/no_color"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/location_button"
+        android:tint="@color/dark_grey"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/city"
-        app:layout_constraintEnd_toStartOf="@+id/city" />
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/readMoreButton"
+        android:layout_width="33dp"
+        android:layout_height="33dp"
+        android:layout_marginBottom="25dp"
+        android:background="@color/no_color"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/book"
+        android:tint="@color/dark_grey"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/city"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
