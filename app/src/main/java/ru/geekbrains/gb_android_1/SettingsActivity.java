@@ -81,7 +81,6 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this,MainActivity.class);
-            //TODO
             intent.putExtra(settingsDataKey, settingsActivityPresenter.createSettingsSwitchArray());
             startActivity(intent);
             finish();
