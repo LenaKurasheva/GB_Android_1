@@ -70,6 +70,7 @@ public class WeatherMainFragment extends Fragment {
         setOnSettingsBtnOnClick();
         setOnReadMoreBtnOnClick();
         showCheckedSwitches();
+        updateCheckedSwitches();
     }
 
     // activity создана, можно к ней обращаться. Выполним начальные действия
@@ -105,7 +106,7 @@ public class WeatherMainFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 showChooseCityFragment();
-                getActivity().finish();//
+                getActivity().finish();
             }
         });
     }
@@ -169,6 +170,11 @@ public class WeatherMainFragment extends Fragment {
     public CurrentCityContainer getCurrentCityContainer() {
         CurrentCityContainer container = new CurrentCityContainer();
         container.currCityName = currentCity;
+        boolean[] switchSettingsArray =  getActivity().getIntent().getBooleanArrayExtra(SettingsActivity.settingsDataKey);
+        if (switchSettingsArray != null) {
+            container.switchSettingsArray = switchSettingsArray;
+            Log.d(myLog,"getCurrentCityContainer(); switchSettingsArray != null" );
+        }
         return container;
     }
 
@@ -200,10 +206,32 @@ public class WeatherMainFragment extends Fragment {
 
     private void showCheckedSwitches(){
             boolean[] settingsSwitchArray = getActivity().getIntent().getBooleanArrayExtra(SettingsActivity.settingsDataKey);
-            if(settingsSwitchArray != null) {
-                if (settingsSwitchArray[0]) Toast.makeText(getActivity(), "NightMode is on", Toast.LENGTH_SHORT).show();
-                if (settingsSwitchArray[1]) windInfoTextView.setVisibility(View.VISIBLE);
-                if (settingsSwitchArray[2]) pressureInfoTextView.setVisibility(View.VISIBLE);
+             isSettingsSwitchArrayTransferred(settingsSwitchArray);
+        }
+
+    private  void updateCheckedSwitches(){
+        if (getArguments() != null) {
+            CurrentCityContainer currentCityContainer = (CurrentCityContainer) getArguments().getSerializable("currCity");
+            if (currentCityContainer != null) {
+                Log.d(myLog, "updateCheckedSwitches from Arguments" );
+                boolean[] settingsSwitchArray = currentCityContainer.switchSettingsArray;
+                isSettingsSwitchArrayTransferred(settingsSwitchArray);
             }
         }
+        if(getActivity().getIntent() != null) {
+            CurrentCityContainer ccc = (CurrentCityContainer) getActivity().getIntent().getSerializableExtra("currCity");
+            if (ccc != null) {
+                boolean[] settingsSwitchArray = ccc.switchSettingsArray;
+                isSettingsSwitchArrayTransferred(settingsSwitchArray);
+            }
+        }
+    }
+
+    private void isSettingsSwitchArrayTransferred(boolean[] settingsSwitchArray){
+        if(settingsSwitchArray != null) {
+            if (settingsSwitchArray[0]) Toast.makeText(getActivity(), "NightMode is on", Toast.LENGTH_SHORT).show();
+            if (settingsSwitchArray[1]) windInfoTextView.setVisibility(View.VISIBLE);
+            if (settingsSwitchArray[2]) pressureInfoTextView.setVisibility(View.VISIBLE);
+        }
+    }
 }

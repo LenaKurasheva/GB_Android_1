@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,6 +138,18 @@ public class ChooseCityFragment extends Fragment {
     public CurrentCityContainer getCurrentCityContainer() {
         CurrentCityContainer container = new CurrentCityContainer();
         container.currCityName = currentCity;
+        if (!isLandscape) {
+            CurrentCityContainer ccc = (CurrentCityContainer) getActivity().getIntent().getSerializableExtra("currCity");
+            boolean[] switchSettingsArray = ccc.switchSettingsArray;
+            if (switchSettingsArray != null) {
+                container.switchSettingsArray = switchSettingsArray;
+                Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentCityContainer(); !isLandscape; switchSettingsArray != null");
+            }
+        } else {
+            CurrentCityContainer currentCityContainer = (CurrentCityContainer) getArguments().getSerializable("currCity");
+            if (currentCityContainer != null) container.switchSettingsArray = currentCityContainer.switchSettingsArray;
+            Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentCityContainer(); else; currentCityContainer != null");
+        }
         return container;
     }
 }
