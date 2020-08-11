@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="degrees">72sp</dimen>
+    <dimen name="settings_btn_marginStart">100dp</dimen>
+    <dimen name="location_btn_marginLeft">110dp</dimen>
+</resources>

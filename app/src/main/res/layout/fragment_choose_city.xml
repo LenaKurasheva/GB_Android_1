@@ -1,56 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/choose_city_gridlayout"
     android:paddingTop="30dp"
-    android:columnCount="4"
-    android:orientation="horizontal"
-    android:id="@+id/choose_city_gridlayout">
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
 
     <TextView
         android:id="@+id/chooseYourCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_columnSpan="4"
-        android:layout_gravity="fill"
-        android:layout_marginStart="20dp"
-        android:paddingBottom="40dp"
+
         android:text="@string/choose_your_city"
-        android:textSize="20sp" />
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.214"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.060000002" />
 
     <EditText
         android:id="@+id/enterCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_columnSpan="3"
-        android:layout_gravity="fill"
-        android:layout_margin="15dp"
-        android:ems="10"
+        android:layout_marginTop="40dp"
+
+        android:autofillHints="Enter your city"
         android:hint="@string/enter_the_name_of_the_city"
-        android:textSize="12sp"
         android:inputType="textPersonName"
-        android:autofillHints="Enter your city" />
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/chooseYourCity"
+        app:layout_constraintTop_toBottomOf="@+id/chooseYourCity" />
 
     <Button
         android:id="@+id/okEnterCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:text="@string/ok" />
+        android:text="@string/ok"
+
+        app:layout_constraintBaseline_toBaselineOf="@+id/enterCity"
+        app:layout_constraintStart_toStartOf="@+id/guideline2" />
 
     <Spinner
         android:id="@+id/cities"
-        android:layout_height="49dp"
-        android:layout_columnSpan="3"
-        android:layout_gravity="fill"
-        android:layout_margin="15dp" />
+
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="@+id/enterCity"
+        app:layout_constraintTop_toBottomOf="@+id/enterCity" />
 
 
     <Button
         android:id="@+id/okSpinnerCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:text="@string/ok" />
+        android:text="@string/ok"
+        app:layout_constraintBaseline_toBaselineOf="@+id/cities"
+        app:layout_constraintStart_toStartOf="@+id/guideline2" />
 
-</GridLayout>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.65" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
