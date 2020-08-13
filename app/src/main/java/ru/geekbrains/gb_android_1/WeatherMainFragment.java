@@ -2,6 +2,7 @@ package ru.geekbrains.gb_android_1;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -12,6 +13,8 @@ import androidx.constraintlayout.widget.ConstraintSet;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,18 +24,38 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
-public class WeatherMainFragment extends Fragment {
+public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private boolean isLandscape;  // Можно ли расположить рядом фрагмент с выбором города
     public static String currentCity = "City";
+    private TextView center;
     private ImageButton settingsButton, locationButton, readMoreButton;
     private TextView cityTextView;
     private TextView degrees;
-    private TextView windInfoTextView, pressureInfoTextView;
+    private TextView feelsLikeTextView, pressureInfoTextView;
     final String myLog = "myLog";
+    private WeekWeatherRecyclerDataAdapter weekWeatherAdapter;
+    private RecyclerView weatherRecyclerView;
+    private List<Integer> weatherIcon = new ArrayList<>();
+    private List<String> weatherStateInfo = new ArrayList<>();
+    private List<String> days = new ArrayList<>();
+    private List<String> daysTemp = new ArrayList<>();
+    private TextView windInfoTextView;
+    private TextView currTime;
+    private TextView weatherStatusTextView;
 
-    static WeatherMainFragment create(CurrentCityContainer container) {
+    List<WeatherData> weekWeatherData;
+    List<String> citiesList;
+
+    static WeatherMainFragment create(CurrentDataContainer container) {
         WeatherMainFragment fragment = new WeatherMainFragment();    // создание
         // Передача параметра
         Bundle args = new Bundle();
@@ -54,6 +77,7 @@ public class WeatherMainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
+
         // Проверяем ориентацию экрана и в случае альбомной, меняем расположение элементов, сдвигая ниже:
         isLandscape = getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
@@ -63,14 +87,21 @@ public class WeatherMainFragment extends Fragment {
             constraintSet.clone(constraintLayout);
             constraintSet.setVerticalBias(R.id.center, 0.8f);
             constraintSet.connect(R.id.degrees,ConstraintSet.BOTTOM,R.id.center,ConstraintSet.TOP,0);
+            constraintSet.setVisibility(R.id.weekWeatherRV, View.GONE);
+            constraintSet.setVisibility(R.id.locationButton, View.INVISIBLE);
+            constraintSet.setHorizontalBias(R.id.readMoreButton, 0.1f);
             constraintSet.applyTo(constraintLayout);
-            //TODO убрать значок локации из горизонтального лэйаута
         }
+
         setOnLocationBtnOnClick();
         setOnSettingsBtnOnClick();
         setOnReadMoreBtnOnClick();
         showCheckedSwitches();
-        updateCheckedSwitches();
+        takeDaysListFromResources(getResources());
+        addDataToWeatherIconsIdFromRes(getResources());
+        addDefaultDataToDaysTempFromRes(getResources());
+        updateWeatherInfo(getResources());
+        setupRecyclerView();
     }
 
     // activity создана, можно к ней обращаться. Выполним начальные действия
@@ -91,14 +122,18 @@ public class WeatherMainFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        TextView center = view.findViewById(R.id.center);
+        center = view.findViewById(R.id.center);
         settingsButton = view.findViewById(R.id.settingsBottom);
         locationButton = view.findViewById(R.id.locationButton);
         cityTextView = view.findViewById(R.id.city);
         degrees = view.findViewById(R.id.degrees);
-        windInfoTextView = view.findViewById(R.id.windInfoTextView);
+        feelsLikeTextView = view.findViewById(R.id.feelsLikeTextView);
         pressureInfoTextView = view.findViewById(R.id.pressureInfoTextView);
         readMoreButton = view.findViewById(R.id.readMoreButton);
+        weatherRecyclerView = view.findViewById(R.id.weekWeatherRV);
+        windInfoTextView = view.findViewById(R.id.windSpeed);
+        currTime = view.findViewById(R.id.currTime);
+        weatherStatusTextView = view.findViewById(R.id.cloudyInfoTextView);
     }
 
     private void setOnLocationBtnOnClick(){
@@ -116,7 +151,9 @@ public class WeatherMainFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Objects.requireNonNull(getActivity()), SettingsActivity.class);
+                intent.putExtra("currCity", getCurrentCityContainer());
                 startActivity(intent);
+                getActivity().finish();
             }
         });
     }
@@ -167,13 +204,32 @@ public class WeatherMainFragment extends Fragment {
         }
     }
 
-    public CurrentCityContainer getCurrentCityContainer() {
-        CurrentCityContainer container = new CurrentCityContainer();
+    public CurrentDataContainer getCurrentCityContainer() {
+        CurrentDataContainer container = new CurrentDataContainer();
         container.currCityName = currentCity;
-        boolean[] switchSettingsArray =  getActivity().getIntent().getBooleanArrayExtra(SettingsActivity.settingsDataKey);
-        if (switchSettingsArray != null) {
-            container.switchSettingsArray = switchSettingsArray;
-            Log.d(myLog,"getCurrentCityContainer(); switchSettingsArray != null" );
+        if (!isLandscape) {
+            CurrentDataContainer cdc = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
+            if(cdc != null) {
+                boolean[] switchSettingsArray = cdc.switchSettingsArray;
+                if (switchSettingsArray != null) {
+                    container.switchSettingsArray = switchSettingsArray;
+                    Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); !isLandscape; switchSettingsArray != null");
+                }
+                List<WeatherData> weekWeatherData = cdc.weekWeatherData;
+                if (weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
+                List<String> citiesList = cdc.citiesList;
+                if (citiesList.size() != 0) container.citiesList = citiesList;
+            }
+        } else {
+            if (getArguments() != null && getArguments().getSerializable("currCity") != null) {
+                CurrentDataContainer currentCityContainer = (CurrentDataContainer) getArguments().getSerializable("currCity");
+                if (currentCityContainer != null) {
+                    container.switchSettingsArray = currentCityContainer.switchSettingsArray;
+                    container.citiesList = currentCityContainer.citiesList;
+                    container.weekWeatherData = currentCityContainer.weekWeatherData;
+                }
+                Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); else; currentCityContainer != null");
+            }
         }
         return container;
     }
@@ -182,7 +238,7 @@ public class WeatherMainFragment extends Fragment {
         if(getArguments() == null){
             Log.d(myLog, "getCityName: UPDATE CHOSEN CITY: getArguments() == null");
             if (getActivity().getIntent().getSerializableExtra("currCity") != null) {
-                CurrentCityContainer currentCityContainer = (CurrentCityContainer) getActivity().getIntent().getSerializableExtra("currCity");
+                CurrentDataContainer currentCityContainer = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
                 currentCity = currentCityContainer.currCityName;
                 // Передача параметра
                 Bundle args = new Bundle();
@@ -191,7 +247,7 @@ public class WeatherMainFragment extends Fragment {
             }
         } else {
             Log.d(myLog, "getCityName: UPDATE CHOSEN CITY: else");
-            CurrentCityContainer currentCityContainer = (CurrentCityContainer) getArguments().getSerializable("currCity");
+            CurrentDataContainer currentCityContainer = (CurrentDataContainer) getArguments().getSerializable("currCity");
             if (currentCityContainer == null) return currentCity;
             currentCity = currentCityContainer.currCityName;
         }
@@ -209,20 +265,40 @@ public class WeatherMainFragment extends Fragment {
              isSettingsSwitchArrayTransferred(settingsSwitchArray);
         }
 
-    private  void updateCheckedSwitches(){
+    private  void updateWeatherInfo(Resources resources){
+//        if(getArguments() == null && getActivity().getIntent() == null){
+            Log.d(myLog, "updateWeatherInfo FIRST TIME" );
+            degrees.setText("+0°");
+
+            String windInfoFromRes = resources.getString(R.string.windInfo);
+            windInfoTextView.setText (String.format(windInfoFromRes, 0));
+
+            Date currentDate = new Date();
+            DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String timeText = timeFormat.format(currentDate);
+            currTime.setText(timeText);
+
+//        }
         if (getArguments() != null) {
-            CurrentCityContainer currentCityContainer = (CurrentCityContainer) getArguments().getSerializable("currCity");
-            if (currentCityContainer != null) {
-                Log.d(myLog, "updateCheckedSwitches from Arguments" );
-                boolean[] settingsSwitchArray = currentCityContainer.switchSettingsArray;
+            CurrentDataContainer currentDataContainer = (CurrentDataContainer) getArguments().getSerializable("currCity");
+            if (currentDataContainer != null) {
+                Log.d(myLog, "updateWeatherInfo from Arguments" );
+                boolean[] settingsSwitchArray = currentDataContainer.switchSettingsArray;
+                weekWeatherData = currentDataContainer.weekWeatherData;
+                citiesList = currentDataContainer.citiesList;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
+                setNewWeatherData(weekWeatherData);
             }
         }
         if(getActivity().getIntent() != null) {
-            CurrentCityContainer ccc = (CurrentCityContainer) getActivity().getIntent().getSerializableExtra("currCity");
-            if (ccc != null) {
-                boolean[] settingsSwitchArray = ccc.switchSettingsArray;
+            CurrentDataContainer cdc = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
+            if (cdc != null) {
+                boolean[] settingsSwitchArray = cdc.switchSettingsArray;
+                weekWeatherData = cdc.weekWeatherData;
+                citiesList = cdc.citiesList;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
+                setNewWeatherData(weekWeatherData);
+
             }
         }
     }
@@ -230,8 +306,69 @@ public class WeatherMainFragment extends Fragment {
     private void isSettingsSwitchArrayTransferred(boolean[] settingsSwitchArray){
         if(settingsSwitchArray != null) {
             if (settingsSwitchArray[0]) Toast.makeText(getActivity(), "NightMode is on", Toast.LENGTH_SHORT).show();
-            if (settingsSwitchArray[1]) windInfoTextView.setVisibility(View.VISIBLE);
+            if (settingsSwitchArray[1]) feelsLikeTextView.setVisibility(View.VISIBLE);
             if (settingsSwitchArray[2]) pressureInfoTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void setNewWeatherData(List<WeatherData> weekWeatherData) {
+        if (weekWeatherData.size() != 0) {
+            Log.d(myLog, "УРА" + weekWeatherData.get(0).feelLike);
+            WeatherData wd = weekWeatherData.get(0);
+            degrees.setText(wd.degrees);
+            windInfoTextView.setText(wd.windInfo);
+
+
+            Date currentDate = new Date();
+            DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String timeText = timeFormat.format(currentDate);
+            currTime.setText(timeText);
+
+            weatherStatusTextView.setText(wd.weatherStateInfo);
+            pressureInfoTextView.setText(wd.pressure);
+            feelsLikeTextView.setText(wd.feelLike);
+
+            for (int i = 0; i < 7; i++) {
+               WeatherData weatherData = weekWeatherData.get(i);
+               daysTemp.set(i, weatherData.degrees);
+               weatherStateInfo.add(i, weatherData.weatherStateInfo);
+                String imageName =weatherData.weatherIcon;
+                Log.d(myLog, "ICON " + i + " " +  imageName);
+                Integer resID = getResources().getIdentifier(imageName , "drawable", getActivity().getPackageName());
+                weatherIcon.set(i, resID);
+            }
+        }
+    }
+
+    public void takeDaysListFromResources(android.content.res.Resources resources){
+            String[] daysStringArr = resources.getStringArray(R.array.days);
+            days = Arrays.asList(daysStringArr);
+    }
+
+    public void addDefaultDataToDaysTempFromRes(android.content.res.Resources resources){
+        String[] daysTempStringArr = resources.getStringArray(R.array.daysTemp);
+        daysTemp  = Arrays.asList(daysTempStringArr);
+    }
+
+    public void addDataToWeatherIconsIdFromRes(android.content.res.Resources resources){
+        weatherIcon.add(R.drawable.cloudy_icon);
+        weatherIcon.add(R.drawable.little_cloudy_sunny);
+        weatherIcon.add(R.drawable.sunny_not_cloudy);
+        weatherIcon.add(R.drawable.little_cloudy_sunny);
+        weatherIcon.add(R.drawable.cloudy_rainy_not_windy);
+        weatherIcon.add(R.drawable.cloudy_very_rainy_and_windy);
+        weatherIcon.add(R.drawable.storm_cloudy);
+    }
+    @Override
+    public void onItemClicked(String itemText) {
+        Toast.makeText(getActivity().getBaseContext(), itemText, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setupRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity().getBaseContext(), LinearLayoutManager.HORIZONTAL, false);
+        weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter ( days,daysTemp,weatherIcon,this);
+
+        weatherRecyclerView.setLayoutManager(layoutManager);
+        weatherRecyclerView.setAdapter(weekWeatherAdapter);
     }
 }

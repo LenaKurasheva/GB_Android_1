@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="degrees">72sp</dimen>
-    <dimen name="settings_btn_marginStart">100dp</dimen>
-    <dimen name="location_btn_marginLeft">110dp</dimen>
+    <dimen name="degrees">45sp</dimen>
+    <dimen name="chooseYourCity_textview">14sp</dimen>
+    <dimen name="orChooseFromList_textview">14sp</dimen>
+    <dimen name="enterCity_editText_marginTop">15dp</dimen>
+    <dimen name="orChooseFromList_textview_marginTop">10dp</dimen>
+    <dimen name="citiesRV_textView_paddingBottom">0dp</dimen>
+    <dimen name="citiesRM_textView_paddingTop">5dp</dimen>
+    <dimen name="citiesRV_marginTop_in_fragment_choose_city">5dp</dimen>
+    <dimen name="okEnterCity_btn_textSize">12sp</dimen>
 </resources>
