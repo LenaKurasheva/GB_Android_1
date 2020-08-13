@@ -15,7 +15,7 @@ import java.util.Objects;
 public class SettingsActivity extends AppCompatActivity {
     private Switch nightModeSwitch;
     private Switch pressureSwitch;
-    private Switch windSpeedSwitch;
+    private Switch feelsLikeSwitch;
     final static String settingsDataKey = "settingsDataKey";
     SettingsActivityPresenter settingsActivityPresenter = SettingsActivityPresenter.getInstance();
 
@@ -26,7 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
         initViews();
         setCurrentSwitchState();
         setOnNightModeSwitchClickListener();
-        setOnWindSpeedSwitchClickListener();
+        setOnFeelsLikeSwitchClickListener();
         setOnPressureSwitchClickListener();
         showBackBtn();
     }
@@ -34,7 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void initViews() {
         nightModeSwitch = findViewById(R.id.night_mode_switch);
         pressureSwitch = findViewById(R.id.pressure_switch);
-        windSpeedSwitch = findViewById(R.id.wind_speed_switch);
+        feelsLikeSwitch = findViewById(R.id.feelsLikeSwitch);
     }
 
     private void setOnNightModeSwitchClickListener(){
@@ -57,12 +57,12 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void setOnWindSpeedSwitchClickListener(){
-        windSpeedSwitch.setOnClickListener(new View.OnClickListener() {
+    private void setOnFeelsLikeSwitchClickListener(){
+        feelsLikeSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SettingsActivity.this, "wind speed added", Toast.LENGTH_SHORT).show();
-                settingsActivityPresenter.changeWindSpeedSwitchStatus();
+                Toast.makeText(SettingsActivity.this, "feelsLikeTemp added", Toast.LENGTH_SHORT).show();
+                settingsActivityPresenter.changeFeelsLikeSwitchStatus();
             }
         });
     }
@@ -81,18 +81,28 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
             Intent intent = new Intent(this,MainActivity.class);
-            intent.putExtra(settingsDataKey, settingsActivityPresenter.createSettingsSwitchArray());
+            intent.putExtra("currCity", getCurrentDataContainer());
             startActivity(intent);
             finish();
         }
         return true;
     }
 
+    private CurrentDataContainer getCurrentDataContainer(){
+        CurrentDataContainer newCdc = new CurrentDataContainer();
+        CurrentDataContainer cdc = (CurrentDataContainer) getIntent().getSerializableExtra("currCity");
+        newCdc.switchSettingsArray = settingsActivityPresenter.createSettingsSwitchArray();
+        if (cdc.weekWeatherData != null) newCdc.weekWeatherData = cdc.weekWeatherData;
+        if (cdc.citiesList.size() > 0) newCdc.citiesList = cdc.citiesList;
+        newCdc.currCityName = cdc.currCityName;
+        return newCdc;
+    }
+
     public void setCurrentSwitchState(){
        boolean[] switchArr =  settingsActivityPresenter.getSettingsArray();
        if(switchArr != null){
            nightModeSwitch.setChecked(switchArr[0]);
-           windSpeedSwitch.setChecked(switchArr[1]);
+           feelsLikeSwitch.setChecked(switchArr[1]);
            pressureSwitch.setChecked(switchArr[2]);
        }
     }

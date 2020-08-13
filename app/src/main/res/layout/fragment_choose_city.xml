@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/choose_city_gridlayout"
-    android:paddingTop="30dp"
+    android:paddingTop="20dp"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
@@ -12,9 +12,8 @@
         android:id="@+id/chooseYourCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
         android:text="@string/choose_your_city"
-        android:textSize="17sp"
+        android:textSize="@dimen/chooseYourCity_textview"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.214"
@@ -26,12 +25,11 @@
         android:id="@+id/enterCity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-
+        android:layout_marginTop="@dimen/enterCity_editText_marginTop"
         android:autofillHints="Enter your city"
         android:hint="@string/enter_the_name_of_the_city"
         android:inputType="textPersonName"
-        android:textSize="12sp"
+        android:textSize="14sp"
         app:layout_constraintStart_toStartOf="@+id/chooseYourCity"
         app:layout_constraintTop_toBottomOf="@+id/chooseYourCity" />
 
@@ -40,28 +38,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ok"
-
+        android:textSize="@dimen/okEnterCity_btn_textSize"
         app:layout_constraintBaseline_toBaselineOf="@+id/enterCity"
         app:layout_constraintStart_toStartOf="@+id/guideline2" />
 
-    <Spinner
-        android:id="@+id/cities"
-
-
+    <TextView
+        android:id="@+id/orChooseFromList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:text="@string/or_choose_from_list"
+        android:textSize="@dimen/orChooseFromList_textview"
         app:layout_constraintStart_toStartOf="@+id/enterCity"
-        app:layout_constraintTop_toBottomOf="@+id/enterCity" />
+        app:layout_constraintTop_toBottomOf="@id/enterCity"
+        android:layout_marginTop="@dimen/orChooseFromList_textview_marginTop"/>
 
-
-    <Button
-        android:id="@+id/okSpinnerCity"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cities"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ok"
-        app:layout_constraintBaseline_toBaselineOf="@+id/cities"
-        app:layout_constraintStart_toStartOf="@+id/guideline2" />
+        android:layout_height="100dp"
+        android:layout_marginTop="@dimen/citiesRV_marginTop_in_fragment_choose_city"
+        app:layout_constraintStart_toStartOf="@+id/enterCity"
+        app:layout_constraintTop_toBottomOf="@+id/orChooseFromList" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"

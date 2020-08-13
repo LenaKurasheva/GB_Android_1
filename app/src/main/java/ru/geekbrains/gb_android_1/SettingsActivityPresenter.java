@@ -8,15 +8,15 @@ public class SettingsActivityPresenter {
     private static final Object syncObj = new Object();
     private boolean isNightModeSwitchOn;
     private boolean isPressureSwitchOn;
-    private boolean isWindSpeedSwitchOn;
+    private boolean isFeelsLikeSwitchOn;
     private boolean[] settingsArray;
 
     private SettingsActivityPresenter(){}
 
     public boolean[] getSettingsArray(){return settingsArray;}
 
-    public void changeWindSpeedSwitchStatus(){
-       isWindSpeedSwitchOn = !isWindSpeedSwitchOn;
+    public void changeFeelsLikeSwitchStatus(){
+       isFeelsLikeSwitchOn = !isFeelsLikeSwitchOn;
     }
 
     public void changeNightModeSwitchStatus(){
@@ -28,7 +28,7 @@ public class SettingsActivityPresenter {
     }
 
     public boolean[] createSettingsSwitchArray(){
-        settingsArray =  new boolean[]{isNightModeSwitchOn, isWindSpeedSwitchOn, isPressureSwitchOn};
+        settingsArray =  new boolean[]{isNightModeSwitchOn, isFeelsLikeSwitchOn, isPressureSwitchOn};
         return  settingsArray;
     }
 
