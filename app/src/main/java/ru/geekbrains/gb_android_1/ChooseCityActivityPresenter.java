@@ -19,31 +19,6 @@ public final class ChooseCityActivityPresenter {
 
     // Конструктор (вызывать извне его нельзя, поэтому он приватный)
     private ChooseCityActivityPresenter(){}
-//
-//    public List<String> getCitiesList(){return citiesList;}
-
-//    public void takeCitiesListFromResources(android.content.res.Resources resources){
-//        if (citiesArray == null) {
-//            citiesArray = resources.getStringArray(R.array.cities);
-//            citiesList = new ArrayList<>(Arrays.asList(citiesArray));
-//        }
-//    }
-
-//    public void getDataFromCitiesSpinner(Context context, Spinner spinner){
-//        citiesListAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, citiesList);
-//        citiesListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinner.setAdapter(citiesListAdapter);
-//    }
-
-//    public void addCityToCitiesSpinner(String city, Context context){
-//        citiesList.add(0, city);
-//        citiesListAdapter.notifyDataSetChanged();
-//        Toast.makeText(context, "added city: " + citiesList.get(0), Toast.LENGTH_LONG).show();
-//    }
-
-//    public void putChosenCityToTopInCitiesSpinner(String chosenCity){
-//        Collections.swap(citiesList, 0 , citiesList.indexOf(chosenCity));
-//    }
 
     // Метод, который возвращает экземпляр объекта.
     // Если объекта нет, то создаем его.

@@ -16,11 +16,15 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch nightModeSwitch;
     private Switch pressureSwitch;
     private Switch feelsLikeSwitch;
-    final static String settingsDataKey = "settingsDataKey";
     SettingsActivityPresenter settingsActivityPresenter = SettingsActivityPresenter.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (settingsActivityPresenter.getIsNightModeSwitchOn()) {
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
         initViews();
@@ -43,6 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Toast.makeText(SettingsActivity.this, "nightmode is in dev", Toast.LENGTH_SHORT).show();
                 settingsActivityPresenter.changeNightModeSwitchStatus();
+                recreate();
             }
         });
     }
@@ -51,7 +56,6 @@ public class SettingsActivity extends AppCompatActivity {
         pressureSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SettingsActivity.this, "pressure added", Toast.LENGTH_SHORT).show();
                 settingsActivityPresenter.changePressureSwitchStatus();
             }
         });
@@ -61,7 +65,6 @@ public class SettingsActivity extends AppCompatActivity {
         feelsLikeSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(SettingsActivity.this, "feelsLikeTemp added", Toast.LENGTH_SHORT).show();
                 settingsActivityPresenter.changeFeelsLikeSwitchStatus();
             }
         });

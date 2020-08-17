@@ -8,5 +8,5 @@ public class CurrentDataContainer implements Serializable {
     public String currCityName = "";
     boolean[] switchSettingsArray;
     List<WeatherData> weekWeatherData = new ArrayList<>();
-    List<String> citiesList = new ArrayList<>();
+    ArrayList<String> citiesList = new ArrayList<>();
 }

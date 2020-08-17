@@ -16,6 +16,15 @@
     <string name="currTime">11:33</string>
     <string name="show_temperature_feels_like">Show temperature feels like</string>
     <string name="feels_like_temp">Feels like: + %1$d °</string>
+    <string name="HintTextInputEditText">Enter the name of the city</string>
+    <string name="setOnBtnOkEnterCityToast">Unacceptable city name</string>
+    <string name="toDeleteCity">To delete city from list click here</string>
+    <string name="delete">Delete</string>
+    <string name="cityDeleted">City deleted</string>
+    <string name="pleaseChooseCotyFirst">Please, choose city first</string>
+    <string name="about">About</string>
+    <string name="appName">Weather</string>
+    <string name="version">Version 1.0 17.08.2020</string>
     <string-array name="cities">
         <item>Moscow</item>
         <item>New York</item>
@@ -31,7 +40,8 @@
         <item>Fr</item>
         <item>St</item>
         <item>Sn</item>
-    </string-array> <string-array name="daysTemp">
+    </string-array>
+    <string-array name="daysTemp">
         <item>+0</item>
         <item>+0</item>
         <item>+0</item>
