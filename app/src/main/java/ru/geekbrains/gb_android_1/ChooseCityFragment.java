@@ -192,7 +192,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             List<WeatherData> list =  Objects.requireNonNull(ccc).weekWeatherData;
             if(list.size() != 0) container.weekWeatherData = list;
             ArrayList<String> cities = ccc.citiesList;
-            if(cities.size() != 0) container.citiesList = cities;
+            container.citiesList = this.citiesList;
         } else {
             CurrentDataContainer currentCityContainer = (CurrentDataContainer) Objects.requireNonNull(getArguments()).getSerializable("currCity");
             if (currentCityContainer != null) container.switchSettingsArray = currentCityContainer.switchSettingsArray;
