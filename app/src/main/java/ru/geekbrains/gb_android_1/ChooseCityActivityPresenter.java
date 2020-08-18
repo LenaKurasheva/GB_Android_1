@@ -36,8 +36,8 @@ public final class ChooseCityActivityPresenter {
     public void updateWeatherInLandscape(CurrentDataContainer container,
                                          androidx.fragment.app.FragmentManager fragmentManager) {
         WeatherMainFragment weatherMainFragment = (WeatherMainFragment) fragmentManager.findFragmentById(R.id.weatherMain);
-       if(weatherMainFragment == null || !weatherMainFragment.getCityName().equals(ChooseCityFragment.currentCity)) {
-           Log.d(myLog, "inside updateWeatherInLandscape");
+//       if(weatherMainFragment == null || !weatherMainFragment.getCityName().equals(ChooseCityFragment.currentCity)) { //*************************
+           Log.d(myLog, "ChooseCityFragment update updateWeatherInLandscape");
            weatherMainFragment = WeatherMainFragment.create(container);
            // Выполняем транзакцию по замене фрагмента
            FragmentTransaction ft = fragmentManager.beginTransaction();
@@ -50,6 +50,6 @@ public final class ChooseCityActivityPresenter {
            ft.commit();
        }
     }
-}
+//} //***************************
 
 

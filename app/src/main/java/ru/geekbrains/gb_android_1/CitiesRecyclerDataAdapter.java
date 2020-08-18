@@ -10,9 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecyclerDataAdapter.ViewHolder> {
     private ArrayList<String> cities;
@@ -78,12 +76,9 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
         }
 
         void setOnClickForItem(final String text) {
-            cityName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(onItemClickCallback != null) {
-                        onItemClickCallback.onItemClicked(text);
-                    }
+            cityName.setOnClickListener(view -> {
+                if(onItemClickCallback != null) {
+                    onItemClickCallback.onItemClicked(text);
                 }
             });
         }

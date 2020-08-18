@@ -24,10 +24,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
@@ -39,22 +36,20 @@ import java.util.regex.Pattern;
 
 public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
-    TextView chooseCity;
-    TextInputEditText enterCity;
-    Button okEnterCity;
+    private TextInputEditText enterCity;
+    private Button okEnterCity;
     static String currentCity = "";
-    List<WeatherData> weekWeatherData = new ArrayList<>();
-    final static String dataKey = "dataKey";
-    final String myLog = "myLog";
-    boolean isLandscape;
     private RecyclerView recyclerView;
     private CitiesRecyclerDataAdapter adapter;
     private ArrayList<String> citiesList = new ArrayList<>();
+    private List<WeatherData> weekWeatherData = new ArrayList<>();
+    final String myLog = "myLog";
+    private boolean isLandscape;
     ChooseCityActivityPresenter chooseCityActivityPresenter = ChooseCityActivityPresenter.getInstance();
-    // Паттерн для проверки, является ли введеное слово названием города.
-    Pattern checkEnterCity = Pattern.compile("^[а-яА-ЯЁa-zA-Z]+(?:[\\s-][а-яА-ЯЁa-zA-Z]+)*$");
     private boolean isErrorShown;
     private static boolean citiesDeleted;
+    // Паттерн для проверки, является ли введеное слово названием города.
+    Pattern checkEnterCity = Pattern.compile("^[а-яА-ЯЁa-zA-Z]+(?:[\\s-][а-яА-ЯЁa-zA-Z]+)*$");
 
     static ChooseCityFragment create(CurrentDataContainer container) {
         ChooseCityFragment fragment = new ChooseCityFragment();    // создание
@@ -79,6 +74,24 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        isLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+        if (isLandscape) {
+            Log.d(myLog, " ChooseCity it IsLandscape");
+            if (CurrentDataContainer.isNightModeOn) {
+                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarDarkTheme);
+            } else {
+                Log.d(myLog, "ChooseCity NoToolbarTheme");
+                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarTheme);
+            }
+        } else {
+            if (CurrentDataContainer.isNightModeOn) {
+                Objects.requireNonNull(getActivity()).setTheme(R.style.AppThemeDark);
+            } else {
+                Log.d(myLog, " ChooseCity AppTheme");
+                Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
+            }
+        }
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true); // Указывает на то, что у фрагмента будет меню
     }
@@ -87,13 +100,15 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_choose_city, container, false);
-        if(((AppCompatActivity) getActivity()).getSupportActionBar() != null) ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Добавляем стрелку назад в меню
+        // Добавляем стрелку назад в меню:
+        if(((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar() != null)
+            Objects.requireNonNull(((AppCompatActivity) getActivity()).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         return rootView;
     }
 
     // Создаем меню на основе макета
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_menu, menu);
     }
@@ -113,10 +128,12 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
         checkIsPositionLandscape();
+        changeThemeIfNecessary();
         checkEnterCityField();
-        takeCitiesListFromResources(getResources());
+//        takeCitiesListFromResources(getResources());
+        takeCitiesList();
         setupRecyclerView();// тут создается адаптер на основании citiesList из этого класса ChooseCityFragment (адаптер берет список городов из этого класса)
-        updateCitiesList();
+//        updateCitiesList();
         setOnBtnOkEnterCityClickListener();
     }
 
@@ -125,40 +142,47 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 == Configuration.ORIENTATION_LANDSCAPE;
     }
 
+    private void changeThemeIfNecessary() {
+        Log.d(myLog, "***********NightMode " + CurrentDataContainer.isNightModeOn);
+        Log.d(myLog, "************NightIsAlreadySettedInChoose " + CurrentDataContainer.NightIsAlreadySettedInChoose );
+        if (CurrentDataContainer.isNightModeOn && !CurrentDataContainer.NightIsAlreadySettedInChoose) {
+            //TODO
+            CurrentDataContainer.NightIsAlreadySettedInChoose = true;
+            Objects.requireNonNull(getActivity()).recreate();
+            Log.d(myLog, "RECREATE weather main fragment");
+        }
+    }
+
     private void initViews(View view) {
-        chooseCity = view.findViewById(R.id.chooseYourCity);
         enterCity = view.findViewById(R.id.enterCity);
         okEnterCity = view.findViewById(R.id.okEnterCity);
         recyclerView = view.findViewById(R.id.cities);
     }
 
     private void setOnBtnOkEnterCityClickListener() {
-        View.OnClickListener btnOkClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // "Выклчаем" editText, чтобы убрать с него фокус и дать возмоность показать ошибку:
-                enterCity.setEnabled(false);
-                // Если ошибка показалась, "включаем" его обратно, чтобы дать поьзователю исправить ошибку:
-                if(isErrorShown) {
-                    enterCity.setEnabled(true);
-                    Toast.makeText(Objects.requireNonNull(getActivity()), R.string.setOnBtnOkEnterCityToast, Toast.LENGTH_SHORT).show();
-                }
-                if(!isErrorShown) {
-                    enterCity.setEnabled(true);
-                    if (!Objects.requireNonNull(enterCity.getText()).toString().equals("")) {
-                        currentCity = enterCity.getText().toString();
-                        //Создаем прогноз погоды на неделю для нового выбранного города:
-                        createRandomWeekWeatherData();
+        View.OnClickListener btnOkClickListener = view -> {
+            // "Выклчаем" editText, чтобы убрать с него фокус и дать возмоность показать ошибку:
+            enterCity.setEnabled(false);
+            // Если ошибка показалась, "включаем" его обратно, чтобы дать поьзователю исправить ошибку:
+            if(isErrorShown) {
+                enterCity.setEnabled(true);
+                Toast.makeText(Objects.requireNonNull(getActivity()), R.string.setOnBtnOkEnterCityToast, Toast.LENGTH_SHORT).show();
+            }
+            if(!isErrorShown) {
+                enterCity.setEnabled(true);
+                if (!Objects.requireNonNull(enterCity.getText()).toString().equals("")) {
+                    currentCity = enterCity.getText().toString();
+                    //Создаем прогноз погоды на неделю для нового выбранного города:
+                    createRandomWeekWeatherData();
 
-                        //Добавляем новый город в RV
-                        adapter.addNewCity(currentCity);
+                    //Добавляем новый город в RV
+                    adapter.addNewCity(currentCity);
 
-                        Toast.makeText(Objects.requireNonNull(getActivity()), currentCity, Toast.LENGTH_SHORT).show();
-                        //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
-                        updateWeatherData();
-                    }
-                    enterCity.setText("");
+                    Toast.makeText(Objects.requireNonNull(getActivity()), currentCity, Toast.LENGTH_SHORT).show();
+                    //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
+                    updateWeatherData();
                 }
+                enterCity.setText("");
             }
         };
         okEnterCity.setOnClickListener(btnOkClickListener);
@@ -191,41 +215,42 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             }
             List<WeatherData> list =  Objects.requireNonNull(ccc).weekWeatherData;
             if(list.size() != 0) container.weekWeatherData = list;
-            ArrayList<String> cities = ccc.citiesList;
             container.citiesList = this.citiesList;
         } else {
             CurrentDataContainer currentCityContainer = (CurrentDataContainer) Objects.requireNonNull(getArguments()).getSerializable("currCity");
             if (currentCityContainer != null) container.switchSettingsArray = currentCityContainer.switchSettingsArray;
             Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); else; currentCityContainer != null");
         }
+        CurrentDataContainer.NightIsAlreadySettedInChoose = false;
         return container;
     }
 
-    private void updateCitiesList() {
+//    private void updateCitiesList() {
+    private void takeCitiesList(){
         if (!isLandscape) {
             Log.d(myLog, "ChooseCityFragment; updateCitiesList; !isLandscape");
-            if(getActivity().getIntent().getSerializableExtra("currCity") != null) {
-                CurrentDataContainer ccc = (CurrentDataContainer) Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity");
-                if(ccc.citiesList != null && ccc.citiesList.size() > 0) {
-                    this.citiesList = ccc.citiesList;
+            if(Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity") != null) {
+                CurrentDataContainer currentCityContainer = (CurrentDataContainer) Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity");
+                if(Objects.requireNonNull(currentCityContainer).citiesList != null && currentCityContainer.citiesList.size() > 0) {
+                    this.citiesList = currentCityContainer.citiesList;
                     Log.d(myLog, "ChooseCityFragment; updateCitiesList; citieslist = " + citiesList.toString());
-                    adapter.refreshCitiesList(ccc.citiesList);
+//                    adapter.refreshCitiesList(currentCityContainer.citiesList);
                 }
-                if(ccc.citiesList.size() == 0 && citiesDeleted){
-                    this.citiesList = ccc.citiesList;
-                    adapter.refreshCitiesList(ccc.citiesList);
+                if(Objects.requireNonNull(currentCityContainer.citiesList).size() == 0 && citiesDeleted){
+                    this.citiesList = currentCityContainer.citiesList;
+//                    adapter.refreshCitiesList(currentCityContainer.citiesList);
                 }
             }
         } else {
-            if (getArguments().getSerializable("currCity") != null) {
+            if (Objects.requireNonNull(getArguments()).getSerializable("currCity") != null) {
                 CurrentDataContainer currentCityContainer = (CurrentDataContainer) Objects.requireNonNull(getArguments()).getSerializable("currCity");
                 if (currentCityContainer != null && currentCityContainer.citiesList.size() > 0) {
                         this.citiesList = currentCityContainer.citiesList;
-                        adapter.refreshCitiesList(currentCityContainer.citiesList);
+//                        adapter.refreshCitiesList(currentCityContainer.citiesList);
                 }
-                if(currentCityContainer.citiesList.size() == 0 && citiesDeleted){
+                if(Objects.requireNonNull(currentCityContainer).citiesList.size() == 0 && citiesDeleted){
                     this.citiesList = currentCityContainer.citiesList;
-                    adapter.refreshCitiesList(currentCityContainer.citiesList);
+//                    adapter.refreshCitiesList(currentCityContainer.citiesList);
                 }
             }
         }
@@ -233,13 +258,15 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     public static void changeCitiesDeletedFlag(){citiesDeleted = true;}
 
-    public void takeCitiesListFromResources(android.content.res.Resources resources){
-        if (citiesList.size() == 0) {
-            String[] cities = resources.getStringArray(R.array.cities);
-             List<String> cit = Arrays.asList(cities);
-            citiesList = new ArrayList<String>(cit);
-        }
-    }
+//переносим в weatherMainFragment
+
+//    public void takeCitiesListFromResources(android.content.res.Resources resources){
+//        if (citiesList.size() == 0) {
+//            String[] cities = resources.getStringArray(R.array.cities);
+//             List<String> cit = Arrays.asList(cities);
+//            citiesList = new ArrayList<>(cit);
+//        }
+//    }
 
     @Override
     public void onItemClicked(String itemText) {
@@ -264,7 +291,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     private void setupRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(Objects.requireNonNull(getActivity()).getBaseContext());
-
         adapter = new CitiesRecyclerDataAdapter(citiesList, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
@@ -277,7 +303,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 tv[0] = (TextView) v;
                 // Валидация, почти точно такая же, как и в поле логина
                 validate(tv[0], checkEnterCity, getString(R.string.HintTextInputEditText));
-                hideSoftKeyboard(getActivity(), enterCity);
+                hideSoftKeyboard(Objects.requireNonNull(getActivity()), enterCity);
             }
         });
     }
@@ -307,5 +333,4 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     private void hideError(TextView view) {
         view.setError(null);
     }
-
 }

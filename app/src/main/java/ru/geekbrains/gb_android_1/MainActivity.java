@@ -18,22 +18,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        int display_mode = getResources().getConfiguration().orientation;
-        Log.d("myLog", "SET THEME FROM ACTIVITY: orientation = " + display_mode);
-        if (display_mode == Configuration.ORIENTATION_LANDSCAPE) {
-            //TODO nightMode
-//            if (WeatherMainFragment.isNightModeOn) {
-//                setTheme(R.style.NoToolbarDarkTheme);
-//            } else {
-                setTheme(R.style.NoToolbarTheme);
-//            }
-//        } else {
-//            if (WeatherMainFragment.isNightModeOn) {
-//                setTheme(R.style.AppThemeDark);
-//            } else {
-//                setTheme(R.style.AppTheme);
-//            }
-        }
+//        int display_mode = getResources().getConfiguration().orientation;
+//        Log.d("myLog", "SET THEME FROM ACTIVITY: orientation = " + display_mode);
+//        if (display_mode == Configuration.ORIENTATION_LANDSCAPE) {
+////            //TODO nightMode
+////            if (WeatherMainFragment.isNightModeOn) {
+////                setTheme(R.style.NoToolbarDarkTheme);
+////            } else {
+//                setTheme(R.style.NoToolbarTheme);
+////            }
+////        } else {
+////            if (WeatherMainFragment.isNightModeOn) {
+////                setTheme(R.style.AppThemeDark);
+////            } else {
+////                setTheme(R.style.AppTheme);
+////            }
+//        }
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
@@ -42,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.replace(R.id.weatherMain, wmf);
             fragmentTransaction.commit();
             Log.d("myLog", "MainActivity: onCreate; savedInstanceState == null");
+        } else {
+            Log.d("myLog", "MainActivity: onCreate; savedInstanceState != null");
         }
+
     }
 
     @Override

@@ -9,4 +9,7 @@ public class CurrentDataContainer implements Serializable {
     boolean[] switchSettingsArray;
     List<WeatherData> weekWeatherData = new ArrayList<>();
     ArrayList<String> citiesList = new ArrayList<>();
+    static boolean isNightModeOn;
+    static boolean NightIsAlreadySettedInMain;
+    static boolean NightIsAlreadySettedInChoose;
 }
