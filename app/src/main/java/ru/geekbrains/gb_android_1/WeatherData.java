@@ -5,12 +5,12 @@ import android.content.res.Resources;
 import java.io.Serializable;
 
 public class WeatherData implements Serializable {
-    String degrees = "";
-    String windInfo = "";
-    String pressure = "";
-    String weatherStateInfo = "";
-    String feelLike = "";
-    String weatherIcon = "";
+    String degrees;
+    String windInfo;
+    String pressure;
+    String weatherStateInfo;
+    String feelLike;
+    String weatherIcon;
 
     int tempRandom;
     int windRandom;

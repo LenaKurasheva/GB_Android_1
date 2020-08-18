@@ -19,6 +19,8 @@ public class SettingsActivityPresenter {
        isFeelsLikeSwitchOn = !isFeelsLikeSwitchOn;
     }
 
+    public boolean getIsNightModeSwitchOn(){return isNightModeSwitchOn;}
+
     public void changeNightModeSwitchStatus(){
         isNightModeSwitchOn = !isNightModeSwitchOn;
     }

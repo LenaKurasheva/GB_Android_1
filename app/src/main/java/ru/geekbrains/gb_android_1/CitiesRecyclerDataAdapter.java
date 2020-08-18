@@ -1,5 +1,6 @@
 package ru.geekbrains.gb_android_1;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecyclerDataAdapter.ViewHolder> {
-    private List<String> cities;
+    private ArrayList<String> cities;
     private RVOnItemClick onItemClickCallback;
 
-    public CitiesRecyclerDataAdapter(List<String> cities, RVOnItemClick onItemClickCallback) {
+    public CitiesRecyclerDataAdapter(ArrayList<String> cities, RVOnItemClick onItemClickCallback) {
         this.cities = cities;
         this.onItemClickCallback = onItemClickCallback;
     }
@@ -45,13 +45,23 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
 
     public void putChosenCityToTopInCitiesList(String chosenCity){
         Collections.swap(cities, 0 , cities.indexOf(chosenCity));
+        notifyDataSetChanged();
     }
 
     public void addNewCity(String newElement) {
-        cities.set(0, newElement);
+        cities.add(0, newElement);
         notifyItemInserted(0);
+        Log.d("myLog", "CitiesRVDAtaAdapter: new city added to ArrayList cities : "  + newElement);
     }
-    public List<String> getCitiesList(){return cities;}
+    public ArrayList<String> getCitiesList(){
+        Log.d("myLog", "CitiesRVDAtaAdapter: get cities to put to CDC: "  + cities.toString());
+        return cities;
+    }
+
+    public void refreshCitiesList(ArrayList<String> newCitiesList){
+        cities = new ArrayList<>(newCitiesList);
+        notifyDataSetChanged();
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private TextView cityName;
@@ -66,12 +76,9 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
         }
 
         void setOnClickForItem(final String text) {
-            cityName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(onItemClickCallback != null) {
-                        onItemClickCallback.onItemClicked(text);
-                    }
+            cityName.setOnClickListener(view -> {
+                if(onItemClickCallback != null) {
+                    onItemClickCallback.onItemClicked(text);
                 }
             });
         }

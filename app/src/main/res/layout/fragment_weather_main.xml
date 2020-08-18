@@ -5,8 +5,9 @@
     android:id="@+id/full_screen_constraintlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/day"
+
     tools:context=".MainActivity">
+<!--    android:background="@color/day"-->
 
     <!-- Center, расположенный посередине; для удобства расположения элементов на экране -->
     <TextView
@@ -19,7 +20,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
         tools:text="Center" />
 
     <!-- Здесь планируется сделать список следующих 10-ти дней с отображением погоды -->
@@ -172,5 +172,18 @@
         app:layout_constraintBottom_toBottomOf="@+id/degrees"
         app:layout_constraintEnd_toEndOf="@+id/settingsBottom"
         app:layout_constraintTop_toTopOf="@+id/degrees" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.94"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.95"
+        app:srcCompat="@android:drawable/ic_delete" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

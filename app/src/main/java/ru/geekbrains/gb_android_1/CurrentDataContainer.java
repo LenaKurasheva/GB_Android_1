@@ -8,5 +8,8 @@ public class CurrentDataContainer implements Serializable {
     public String currCityName = "";
     boolean[] switchSettingsArray;
     List<WeatherData> weekWeatherData = new ArrayList<>();
-    List<String> citiesList = new ArrayList<>();
+    ArrayList<String> citiesList = new ArrayList<>();
+    static boolean isNightModeOn;
+    static boolean NightIsAlreadySettedInMain;
+    static boolean NightIsAlreadySettedInChoose;
 }
