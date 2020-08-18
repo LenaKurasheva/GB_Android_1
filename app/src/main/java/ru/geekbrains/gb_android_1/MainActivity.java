@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme();
 
 //        int display_mode = getResources().getConfiguration().orientation;
 //        Log.d("myLog", "SET THEME FROM ACTIVITY: orientation = " + display_mode);
@@ -46,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
             Log.d("myLog", "MainActivity: onCreate; savedInstanceState != null");
         }
 
+    }
+
+    private void setTheme(){
+        if(CurrentDataContainer.isNightModeOn){
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
     }
 
     @Override

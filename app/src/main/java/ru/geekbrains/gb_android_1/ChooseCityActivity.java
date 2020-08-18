@@ -15,6 +15,7 @@ public class ChooseCityActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme();
         setContentView(R.layout.choose_city);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -32,6 +33,14 @@ public class ChooseCityActivity extends AppCompatActivity {
                     .beginTransaction()
                     .replace(R.id.chooseCityFragmentContainer, chooseCityFragment)
                     .commit();
+        }
+    }
+
+    private void setTheme(){
+        if(CurrentDataContainer.isNightModeOn){
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppTheme);
         }
     }
 }

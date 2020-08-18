@@ -2,8 +2,10 @@ package ru.geekbrains.gb_android_1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -20,12 +22,13 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (settingsActivityPresenter.getIsNightModeSwitchOn()) {
-            setTheme(R.style.AppThemeDark);
-        } else {
-            setTheme(R.style.AppTheme);
-        }
+//        if (settingsActivityPresenter.getIsNightModeSwitchOn()) {
+//            setTheme(R.style.AppThemeDark);
+//        } else {
+//            setTheme(R.style.AppTheme);
+//        }
         super.onCreate(savedInstanceState);
+        setTheme();
         setContentView(R.layout.settings);
         initViews();
         setCurrentSwitchState();
@@ -42,14 +45,33 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setOnNightModeSwitchClickListener(){
-        nightModeSwitch.setOnClickListener(new View.OnClickListener() {
+        nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(SettingsActivity.this, "nightmode is in dev", Toast.LENGTH_SHORT).show();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                CurrentDataContainer.isNightModeOn = isChecked;
                 settingsActivityPresenter.changeNightModeSwitchStatus();
+                Log.d("Night", "SettingsActivity RECREATE");
                 recreate();
             }
         });
+
+    }
+    //
+//        new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(SettingsActivity.this, "nightmode is in dev", Toast.LENGTH_SHORT).show();
+//                settingsActivityPresenter.changeNightModeSwitchStatus();
+//                recreate();
+//            }
+//        });
+//    }
+    private void setTheme(){
+        if(CurrentDataContainer.isNightModeOn){
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
     }
 
     private void setOnPressureSwitchClickListener(){
