@@ -74,24 +74,24 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-//        isLandscape = getResources().getConfiguration().orientation
-//                == Configuration.ORIENTATION_LANDSCAPE;
-//        if (isLandscape) {
-//            Log.d(myLog, " ChooseCity it IsLandscape");
-//            if (CurrentDataContainer.isNightModeOn) {
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarDarkTheme);
-//            } else {
-//                Log.d(myLog, "ChooseCity NoToolbarTheme");
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarTheme);
-//            }
-//        } else {
-//            if (CurrentDataContainer.isNightModeOn) {
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.AppThemeDark);
-//            } else {
-//                Log.d(myLog, " ChooseCity AppTheme");
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
-//            }
-//        }
+        isLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+        if (isLandscape) {
+            Log.d(myLog, " ChooseCity it IsLandscape");
+            if (CurrentDataContainer.isNightModeOn) {
+                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarDarkTheme);
+            } else {
+                Log.d(myLog, "ChooseCity NoToolbarTheme");
+                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarTheme);
+            }
+        } else {
+            if (CurrentDataContainer.isNightModeOn) {
+                Objects.requireNonNull(getActivity()).setTheme(R.style.AppThemeDark);
+            } else {
+                Log.d(myLog, " ChooseCity AppTheme");
+                Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
+            }
+        }
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true); // Указывает на то, что у фрагмента будет меню
     }

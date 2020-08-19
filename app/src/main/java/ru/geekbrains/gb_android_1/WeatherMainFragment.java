@@ -71,24 +71,24 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d("myLog", "onCreate - fragment WeatherMainFragment");
         // В этот блок мы заходим, только когда пересоздаем активити
-//        isLandscape = getResources().getConfiguration().orientation
-//                == Configuration.ORIENTATION_LANDSCAPE;
-//        if (isLandscape) {
-//            Log.d(myLog, " it IsLandscape");
-//            if (CurrentDataContainer.isNightModeOn) {
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarDarkTheme);
-//            } else {
-//                Log.d(myLog, "NoToolbarTheme");
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarTheme);
-//            }
-//        } else {
-//            if (CurrentDataContainer.isNightModeOn) {
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.AppThemeDark);
-//            } else {
-//                Log.d(myLog, "AppTheme");
-//                Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
-//            }
-//        }
+        isLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+        if (isLandscape) {
+            Log.d(myLog, " it IsLandscape");
+            if (CurrentDataContainer.isNightModeOn) {
+                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarDarkTheme);
+            } else {
+                Log.d(myLog, "NoToolbarTheme");
+                Objects.requireNonNull(getActivity()).setTheme(R.style.NoToolbarTheme);
+            }
+        } else {
+            if (CurrentDataContainer.isNightModeOn) {
+                Objects.requireNonNull(getActivity()).setTheme(R.style.AppThemeDark);
+            } else {
+                Log.d(myLog, "AppTheme");
+                Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
+            }
+        }
         super.onCreate(savedInstanceState);
     }
 
@@ -344,14 +344,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         Log.d(myLog, "NightIsAlreadySettedInMain " + CurrentDataContainer.NightIsAlreadySettedInMain );
         Log.d(myLog, "NightMode " + CurrentDataContainer.isNightModeOn);
         if(settingsSwitchArray != null) {
-//            if (settingsSwitchArray[0] && !CurrentDataContainer.NightIsAlreadySettedInMain) {
+            if (settingsSwitchArray[0] && !CurrentDataContainer.NightIsAlreadySettedInMain) {
                 //TODO
-//                CurrentDataContainer.NightIsAlreadySettedInMain = true;
-//                CurrentDataContainer.isNightModeOn = true;
-//                Objects.requireNonNull(getActivity()).recreate();
-//                Log.d(myLog, " RECREATE weather main fragment");
-//            }
-//            if (!settingsSwitchArray[0]) CurrentDataContainer.isNightModeOn = false;
+                CurrentDataContainer.NightIsAlreadySettedInMain = true;
+                CurrentDataContainer.isNightModeOn = true;
+                Objects.requireNonNull(getActivity()).recreate();
+                Log.d(myLog, " RECREATE weather main fragment");
+            }
+            if (!settingsSwitchArray[0]) CurrentDataContainer.isNightModeOn = false;
             if (settingsSwitchArray[1]) feelsLikeTextView.setVisibility(View.VISIBLE);
             if (settingsSwitchArray[2]) pressureInfoTextView.setVisibility(View.VISIBLE);
         }
