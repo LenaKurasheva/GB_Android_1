@@ -16,18 +16,35 @@ public class WeatherData implements Serializable {
     int windRandom;
     int pressureRandom;
 
+    public WeatherData(Resources resources, String degrees, String windInfo, String pressure, String weatherStateInfo, String feelLike, String weatherIcon){
+        this.degrees = "+" + degrees + "°";
+
+        String windInfoFromRes = resources.getString(R.string.windInfo);
+        this.windInfo = String.format(windInfoFromRes, windInfo);
+
+        String pressureInfoFromRes = resources.getString(R.string.pressureInfo);
+        this.pressure = String.format(pressureInfoFromRes, pressure);
+
+        this.weatherStateInfo = weatherStateInfo;
+
+        String feelsLikeInfoFromRes = resources.getString(R.string.feels_like_temp);
+        this.feelLike = String.format(feelsLikeInfoFromRes, (feelLike));
+
+        this.weatherIcon = weatherIcon;
+    }
+
     public WeatherData(Resources resources){
         calculateRandomValues();
         degrees = "+" + tempRandom + "°";
 
         String feelsLikeInfoFromRes = resources.getString(R.string.feels_like_temp);
-        feelLike = String.format(feelsLikeInfoFromRes, (tempRandom - 2));
+        feelLike = String.format(feelsLikeInfoFromRes, (String.valueOf(tempRandom - 2)));
 
         String pressureInfoFromRes = resources.getString(R.string.pressureInfo);
-        pressure = String.format(pressureInfoFromRes, pressureRandom);
+        pressure = String.format(pressureInfoFromRes, String.valueOf(pressureRandom));
 
         String windInfoFromRes = resources.getString(R.string.windInfo);
-        windInfo = String.format(windInfoFromRes, windRandom);
+        windInfo = String.format(windInfoFromRes, String.valueOf(windRandom));
 
         String[] weatherStateInfoFromRes = resources.getStringArray(R.array.weatherState);
         int weatherStateIndex = (int)(Math.random() * weatherStateInfoFromRes.length);

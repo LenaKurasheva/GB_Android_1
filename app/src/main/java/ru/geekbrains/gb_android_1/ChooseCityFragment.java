@@ -44,7 +44,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     private ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
     final String myLog = "myLog";
     private boolean isLandscape;
-    ChooseCityActivityPresenter chooseCityActivityPresenter = ChooseCityActivityPresenter.getInstance();
+    ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
     private boolean isErrorShown;
     // Паттерн для проверки, является ли введеное слово названием города.
     Pattern checkEnterCity = Pattern.compile("^[а-яА-ЯЁa-zA-Z]+(?:[\\s-][а-яА-ЯЁa-zA-Z]+)*$");
@@ -162,7 +162,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 if (!Objects.requireNonNull(enterCity.getText()).toString().equals("")) {
                     currentCity = enterCity.getText().toString();
                     //Создаем прогноз погоды на неделю для нового выбранного города:
-                    createRandomWeekWeatherData();
+                    takeWeatherInfoForFiveDays();
                     Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag -> weatherCreated: " + weatherCreated);
                     weatherCreated = true;
 
@@ -181,7 +181,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     private void updateWeatherData(){
         if(isLandscape) {
-            chooseCityActivityPresenter.updateWeatherInLandscape(getCurrentDataContainer(), Objects.requireNonNull(getFragmentManager()));
+            chooseCityPresenter.updateWeatherInLandscape(getCurrentDataContainer(), Objects.requireNonNull(getFragmentManager()));
         } else {
             Intent intent = new Intent();
             intent.setClass(Objects.requireNonNull(getActivity()), MainActivity.class);
@@ -270,7 +270,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         adapter.putChosenCityToTopInCitiesList(currentCity);
 
         //Создаем прогноз погоды на неделю для нового выбранного города:
-        createRandomWeekWeatherData();
+        takeWeatherInfoForFiveDays();
         Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag -> weatherCreated: " + weatherCreated);
         weatherCreated = true;
 
@@ -293,13 +293,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 }).show();
     }
 
-    private void createRandomWeekWeatherData(){
-        Log.d(myLog, "ChooseCityFragment - createRandomWeekWeatherData()");
-        ArrayList<WeatherData> weather = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            weather.add(new WeatherData(getResources()));
-        }
-        weekWeatherData = weather;
+    private void takeWeatherInfoForFiveDays(){
+        chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources(), getActivity());
+        this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
     }
 
     private void setupRecyclerView() {
