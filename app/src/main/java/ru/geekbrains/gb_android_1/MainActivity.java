@@ -1,7 +1,6 @@
 package ru.geekbrains.gb_android_1;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -9,7 +8,6 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
@@ -17,23 +15,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        int display_mode = getResources().getConfiguration().orientation;
-//        Log.d("myLog", "SET THEME FROM ACTIVITY: orientation = " + display_mode);
-//        if (display_mode == Configuration.ORIENTATION_LANDSCAPE) {
-////            //TODO nightMode
-////            if (WeatherMainFragment.isNightModeOn) {
-////                setTheme(R.style.NoToolbarDarkTheme);
-////            } else {
-//                setTheme(R.style.NoToolbarTheme);
-////            }
-////        } else {
-////            if (WeatherMainFragment.isNightModeOn) {
-////                setTheme(R.style.AppThemeDark);
-////            } else {
-////                setTheme(R.style.AppTheme);
-////            }
-//        }
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
@@ -45,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d("myLog", "MainActivity: onCreate; savedInstanceState != null");
         }
-
     }
 
     @Override
@@ -56,15 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.about: {
-                Intent intent = new Intent(this, InfoActivity.class);
-                startActivity(intent);
-            }
-            default: {
-                return false;
-            }
+        if (item.getItemId() == R.id.about) {
+            Intent intent = new Intent(this, InfoActivity.class);
+            startActivity(intent);
         }
+        return false;
     }
 
     @Override

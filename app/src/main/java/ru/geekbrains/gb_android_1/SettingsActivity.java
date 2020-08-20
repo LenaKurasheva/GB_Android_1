@@ -2,8 +2,8 @@ package ru.geekbrains.gb_android_1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -42,32 +42,19 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setOnNightModeSwitchClickListener(){
-        nightModeSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(SettingsActivity.this, "nightmode is in dev", Toast.LENGTH_SHORT).show();
-                settingsActivityPresenter.changeNightModeSwitchStatus();
-                recreate();
-            }
+        nightModeSwitch.setOnClickListener(view -> {
+            Toast.makeText(SettingsActivity.this, "nightmode is in dev", Toast.LENGTH_SHORT).show();
+            settingsActivityPresenter.changeNightModeSwitchStatus();
+            recreate();
         });
     }
 
     private void setOnPressureSwitchClickListener(){
-        pressureSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settingsActivityPresenter.changePressureSwitchStatus();
-            }
-        });
+        pressureSwitch.setOnClickListener(view -> settingsActivityPresenter.changePressureSwitchStatus());
     }
 
     private void setOnFeelsLikeSwitchClickListener(){
-        feelsLikeSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                settingsActivityPresenter.changeFeelsLikeSwitchStatus();
-            }
-        });
+        feelsLikeSwitch.setOnClickListener(view -> settingsActivityPresenter.changeFeelsLikeSwitchStatus());
     }
 
     // Показывает стрелку назад на панели действий
@@ -95,7 +82,10 @@ public class SettingsActivity extends AppCompatActivity {
         CurrentDataContainer newCdc = new CurrentDataContainer();
         CurrentDataContainer cdc = (CurrentDataContainer) getIntent().getSerializableExtra("currCity");
         newCdc.switchSettingsArray = settingsActivityPresenter.createSettingsSwitchArray();
-        if (cdc.weekWeatherData != null) newCdc.weekWeatherData = cdc.weekWeatherData;
+        if (Objects.requireNonNull(cdc).weekWeatherData != null && Objects.requireNonNull(cdc).weekWeatherData.size() > 0){
+            newCdc.weekWeatherData = cdc.weekWeatherData;
+            Log.d("myLog", "SettingsActivity - getCurrentDataContainer -> weekWeatherData!=null; currTemp: " + newCdc.weekWeatherData.get(0).degrees);
+        }
         if (cdc.citiesList.size() > 0) newCdc.citiesList = cdc.citiesList;
         newCdc.currCityName = cdc.currCityName;
         return newCdc;

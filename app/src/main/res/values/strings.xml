@@ -20,6 +20,7 @@
     <string name="setOnBtnOkEnterCityToast">Unacceptable city name</string>
     <string name="toDeleteCity">To delete city from list click here</string>
     <string name="delete">Delete</string>
+    <string name="delete_city">Delete city?</string>
     <string name="cityDeleted">City deleted</string>
     <string name="pleaseChooseCotyFirst">Please, choose city first</string>
     <string name="about">About</string>

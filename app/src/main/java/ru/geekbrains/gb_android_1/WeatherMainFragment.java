@@ -24,9 +24,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +35,7 @@ import java.util.Objects;
 
 public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private boolean isLandscape;  // Можно ли расположить рядом фрагмент с выбором города
-    public static String currentCity;
+    public static String currentCity = "";
     private ImageButton settingsButton, locationButton, readMoreButton;
     private TextView cityTextView;
     private TextView degrees;
@@ -46,15 +43,16 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     final String myLog = "myLog";
     private RecyclerView weatherRecyclerView;
     private List<Integer> weatherIcon = new ArrayList<>();
-    private List<String> weatherStateInfo = new ArrayList<>();
+    private ArrayList<String> weatherStateInfo = new ArrayList<>();
     private List<String> days = new ArrayList<>();
     private List<String> daysTemp = new ArrayList<>();
     private TextView windInfoTextView;
     private TextView currTime;
     private TextView weatherStatusTextView;
-    private FloatingActionButton fab;
-    private static boolean isNight;
     private ArrayList<String> citiesListFromRes;
+    private ArrayList<String> citiesList;
+    private ArrayList<WeatherData> weekWeatherData;
+
 
     static WeatherMainFragment create(CurrentDataContainer container) {
         WeatherMainFragment fragment = new WeatherMainFragment();    // создание
@@ -89,6 +87,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
             }
         }
+
         super.onCreate(savedInstanceState);
     }
 
@@ -115,9 +114,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         takeDaysListFromResources(getResources());
         addDataToWeatherIconsIdFromRes();
         addDefaultDataToDaysTempFromRes(getResources());
-        updateWeatherInfo(getResources());
+        updateWeatherInfo(getResources()); //здесь забрали citiesList
         setupRecyclerView();
-        setOnFAB();
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -130,12 +128,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         isLandscape = getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
         // Если можно нарисовать рядом выбор города, то сделаем это
+        Log.d(myLog, "WeatherMainFragment: onActivityCreated !BEFORE updateChosenCity, currentCity: " + currentCity);
+
         if (isLandscape) {
-            showChooseCityFragment(getCurrentCityContainer());
+            showChooseCityFragment(getCurrentDataContainer());
         }
-        updateChosenCity();
-        Toast.makeText(getActivity(), "Update city to " + currentCity, Toast.LENGTH_LONG).show();
-        Log.d(myLog, "WeatherMainFragment: onActivityCreated; currentCity: " + currentCity);
+        Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
+        updateChosenCity(savedInstanceState);
+        Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
     }
 
     private void moveViewsIfLandscapeOrientation( View view){
@@ -152,7 +152,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             constraintSet.setVisibility(R.id.locationButton, View.INVISIBLE);
             constraintSet.setHorizontalBias(R.id.readMoreButton, 0.1f);
             constraintSet.applyTo(constraintLayout);
-        } else {fab.setVisibility(View.INVISIBLE);}
+        }
     }
 
     private void initViews(View view) {
@@ -167,30 +167,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         windInfoTextView = view.findViewById(R.id.windSpeed);
         currTime = view.findViewById(R.id.currTime);
         weatherStatusTextView = view.findViewById(R.id.cloudyInfoTextView);
-        fab = view.findViewById(R.id.fab);
-    }
-
-    private void setOnFAB(){
-        fab.setOnClickListener(view -> Snackbar.make(view, R.string.toDeleteCity, Snackbar.LENGTH_LONG)
-                .setAction(R.string.delete, v -> {
-                    CurrentDataContainer newCurDataCont = getCurrentCityContainer();
-                    if(newCurDataCont.citiesList.size() == 0) {
-                        Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), R.string.pleaseChooseCotyFirst,
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    newCurDataCont.citiesList.remove(0);
-                    ChooseCityFragment.changeCitiesDeletedFlag();
-                    showChooseCityFragment(newCurDataCont);
-                    if(!isLandscape) Objects.requireNonNull(getActivity()).finish();
-                    Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), R.string.cityDeleted,
-                            Toast.LENGTH_SHORT).show();
-                }).show());
     }
 
     private void setOnLocationBtnOnClick(){
         locationButton.setOnClickListener(view -> {
-            showChooseCityFragment(getCurrentCityContainer());
+            showChooseCityFragment(getCurrentDataContainer());
             Objects.requireNonNull(getActivity()).finish();
         });
     }
@@ -198,7 +179,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private void setOnSettingsBtnOnClick() {
         settingsButton.setOnClickListener(view -> {
             Intent intent = new Intent(Objects.requireNonNull(getActivity()), SettingsActivity.class);
-            intent.putExtra("currCity", getCurrentCityContainer());
+            intent.putExtra("currCity", getCurrentDataContainer());
             startActivity(intent);
             getActivity().finish();
         });
@@ -213,7 +194,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         });
     }
 
-
     // Показать выбор города. Ecли возможно, то показать рядом с погодой,
     // если нет, то открыть вторую activity
     private void showChooseCityFragment(CurrentDataContainer cdc) {
@@ -223,8 +203,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                     Objects.requireNonNull(getFragmentManager()).findFragmentById(R.id.chooseCity);
 
             // Если есть необходимость, то выведем выбор города
-//            if (chooseCityFragment == null || !chooseCityFragment.getCurrentCity().equals(currentCity)) { //**************************************
-
+            if (chooseCityFragment == null || !chooseCityFragment.getCurrentCity().equals(currentCity)) {
+                Log.d(myLog, "WeatherMainFragment -> showChoseCityFRagment -> создаем фрагмент ChoseCityFragment рядом в гориз.режиме");
                 // Создаем новый фрагмент с текущей позицией для города
                 chooseCityFragment = ChooseCityFragment.create(cdc);
 
@@ -232,7 +212,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.chooseCity, chooseCityFragment);  // замена фрагмента
                 ft.commit();
-//            } // ******************************************************************************************************
+            }
         } else {
             // Если нельзя вывести выбор города рядом, откроем вторую activity
             Intent intent = new Intent();
@@ -243,9 +223,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
     }
 
-    public CurrentDataContainer getCurrentCityContainer() {
+    public CurrentDataContainer getCurrentDataContainer() {
+        Log.d(myLog, "WeatherMainFragment - getCurrentDataContainer() ");
         CurrentDataContainer container = new CurrentDataContainer();
         container.currCityName = currentCity;
+        container.citiesList = this.citiesList;
         if (!isLandscape) {
             CurrentDataContainer cdc = (CurrentDataContainer) Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity");
             if(cdc != null) {
@@ -254,54 +236,52 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                     container.switchSettingsArray = switchSettingsArray;
                     Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); !isLandscape; switchSettingsArray != null");
                 }
-                List<WeatherData> weekWeatherData = cdc.weekWeatherData;
+                weekWeatherData = cdc.weekWeatherData;
                 if (weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
-                ArrayList<String> citiesList = cdc.citiesList;
-                if (citiesList.size() != 0) container.citiesList = citiesList;
-            } else {container.citiesList = citiesListFromRes;}
+            }
+
             CurrentDataContainer.NightIsAlreadySettedInMain = false;
         } else {
             if (getArguments() != null && getArguments().getSerializable("currCity") != null) {
                 CurrentDataContainer currentCityContainer = (CurrentDataContainer) getArguments().getSerializable("currCity");
                 if (currentCityContainer != null) {
                     container.switchSettingsArray = currentCityContainer.switchSettingsArray;
-                    container.citiesList = currentCityContainer.citiesList;
-                    container.weekWeatherData = currentCityContainer.weekWeatherData;
+                    weekWeatherData = currentCityContainer.weekWeatherData;
+                    if (weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
                 }
-            } else {container.citiesList = citiesListFromRes;}
-            Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); else; currentCityContainer != null");
+
+                Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); else; currentCityContainer != null");
+            }
         }
+        if(getArguments() == null && Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity") == null) container.weekWeatherData = weekWeatherData;
         return container;
     }
 
-    String getCityName() {
-//        if(getArguments() == null){
-//            Log.d(myLog, "getCityName: UPDATE CHOSEN CITY: getArguments() == null");
-        if (Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity") != null) {
-            CurrentDataContainer currentCityContainer = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
-            currentCity = Objects.requireNonNull(currentCityContainer).currCityName;
-            // Передача параметра
-            Bundle args = new Bundle();
-            args.putSerializable("currCity", getActivity().getIntent().getSerializableExtra("currCity"));
-            this.setArguments(args);
-            return currentCity;
-        }
-        if(getArguments() != null) {
-            Log.d(myLog, "getCityName: UPDATE CHOSEN CITY; getArguments() != null");
+    private String getCityName() {
+        currentCity = citiesListFromRes.get(0);
+        Log.d(myLog, "WeatherMainFragment - updateChosenCity() -> getCityName() fromRes: " + currentCity);
+
+        if (getArguments() != null) {
             CurrentDataContainer currentCityContainer = (CurrentDataContainer) getArguments().getSerializable("currCity");
-            if (currentCityContainer != null){
+            if (currentCityContainer != null) {
                 currentCity = currentCityContainer.currCityName;
-                return currentCity;
+                Log.d(myLog, "WeatherMainFragment - updateChosenCity() -> getCityName() fromArguments: " + currentCity);
+            }
+        } else {
+
+            if (Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity") != null) {
+                CurrentDataContainer currentCityContainer = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
+                currentCity = Objects.requireNonNull(currentCityContainer).currCityName;
+                Log.d(myLog, "WeatherMainFragment - updateChosenCity() -> getCityName() fromIntent: " + currentCity);
             }
         }
-        currentCity = citiesListFromRes.get(0);
-        Log.d(myLog, currentCity);
         return currentCity;
     }
 
-    private void updateChosenCity() {
-        cityTextView.setText(getCityName());
-        Toast.makeText(getContext(), "updateChosenCity", Toast.LENGTH_SHORT).show();
+    private void updateChosenCity(Bundle savedInstanceState) {
+        if (savedInstanceState == null) cityTextView.setText(getCityName());
+        cityTextView.setText(currentCity);
+        Toast.makeText(getActivity(), "Update city to " + currentCity, Toast.LENGTH_LONG).show();
     }
 
     private  void updateWeatherInfo(Resources resources){
@@ -316,26 +296,33 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             String timeText = timeFormat.format(currentDate);
             currTime.setText(timeText);
 
-        List<WeatherData> weekWeatherData;
+        this.citiesList = citiesListFromRes;
+        Log.d(myLog, "WeathrMainFragment - updateWeatherInfo - take ciiesListFromGes: " + citiesList.toString());
+
+        boolean[] settingsSwitchArray;
         if (getArguments() != null) {
             CurrentDataContainer currentDataContainer = (CurrentDataContainer) getArguments().getSerializable("currCity");
             if (currentDataContainer != null) {
-                Log.d(myLog, "updateWeatherInfo from Arguments" );
-                boolean[] settingsSwitchArray = currentDataContainer.switchSettingsArray;
+                currentCity = currentDataContainer.currCityName;
+                settingsSwitchArray = currentDataContainer.switchSettingsArray;
                 weekWeatherData = currentDataContainer.weekWeatherData;
+                citiesList = currentDataContainer.citiesList;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
+                Log.d(myLog, "updateWeatherInfo from Arguments; curr temp = "+weekWeatherData.get(0).degrees);
                 setNewWeatherData(weekWeatherData);
             }
-        }
-        if(Objects.requireNonNull(getActivity()).getIntent() != null) {
-            CurrentDataContainer cdc = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
-            if (cdc != null) {
-                Log.d(myLog, "updateWeatherInfo from Intent" );
-                boolean[] settingsSwitchArray = cdc.switchSettingsArray;
-                weekWeatherData = cdc.weekWeatherData;
-                isSettingsSwitchArrayTransferred(settingsSwitchArray);
-                setNewWeatherData(weekWeatherData);
-
+        } else {
+            if (Objects.requireNonNull(getActivity()).getIntent() != null) {
+                CurrentDataContainer cdc = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
+                if (cdc != null) {
+                    Log.d(myLog, "updateWeatherInfo from Intent");
+                    currentCity = cdc.currCityName;
+                    settingsSwitchArray = cdc.switchSettingsArray;
+                    weekWeatherData = cdc.weekWeatherData;
+                    citiesList = cdc.citiesList;
+                    isSettingsSwitchArrayTransferred(settingsSwitchArray);
+                    setNewWeatherData(weekWeatherData);
+                }
             }
         }
     }
@@ -384,18 +371,10 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
     }
 
-    //переносим из  ChooseCityFragment
-
     public void takeCitiesListFromResources(android.content.res.Resources resources){
         String[] cities = resources.getStringArray(R.array.cities);
         List<String> cit = Arrays.asList(cities);
         citiesListFromRes = new ArrayList<>(cit);
-//
-//        if (this.citiesList.size() == 0) {
-//            String[] cities = resources.getStringArray(R.array.cities);
-//             List<String> cit = Arrays.asList(cities);
-//            this.citiesList = new ArrayList<>(cit);
-//        }
     }
 
     public void takeDaysListFromResources(android.content.res.Resources resources){
@@ -417,9 +396,15 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         weatherIcon.add(R.drawable.cloudy_very_rainy_and_windy);
         weatherIcon.add(R.drawable.storm_cloudy);
     }
+
+
     @Override
-    public void onItemClicked(String itemText) {
-        Toast.makeText(Objects.requireNonNull(getActivity()).getBaseContext(), itemText, Toast.LENGTH_SHORT).show();
+    public void onItemClicked(View view, String itemText) {
+
+    }
+
+    @Override
+    public void onItemLongPressed(View itemText) {
     }
 
     private void setupRecyclerView() {

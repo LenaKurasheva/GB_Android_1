@@ -34,7 +34,7 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
         String text = cities.get(position);
 
         holder.setTextToTextView(text);
-        holder.setOnClickForItem(text);
+        holder.setOnClickForItem(text, position);
     }
 
     @Override
@@ -44,7 +44,13 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
 
 
     public void putChosenCityToTopInCitiesList(String chosenCity){
-        Collections.swap(cities, 0 , cities.indexOf(chosenCity));
+        cities.remove(chosenCity);
+        cities.add(0, chosenCity);
+        notifyDataSetChanged();
+    }
+
+    public void remove(String cityName) {
+        cities.remove(cityName);
         notifyDataSetChanged();
     }
 
@@ -58,10 +64,6 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
         return cities;
     }
 
-    public void refreshCitiesList(ArrayList<String> newCitiesList){
-        cities = new ArrayList<>(newCitiesList);
-        notifyDataSetChanged();
-    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private TextView cityName;
@@ -75,10 +77,22 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
             cityName.setText(text);
         }
 
-        void setOnClickForItem(final String text) {
-            cityName.setOnClickListener(view -> {
-                if(onItemClickCallback != null) {
-                    onItemClickCallback.onItemClicked(text);
+        void setOnClickForItem(final String text, int position) {
+            cityName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(onItemClickCallback != null) {
+                        onItemClickCallback.onItemClicked(view, text);
+                    }
+                }
+            });
+            cityName.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if(onItemClickCallback != null) {
+                        onItemClickCallback.onItemLongPressed(view);
+                    }
+                    return false;
                 }
             });
         }

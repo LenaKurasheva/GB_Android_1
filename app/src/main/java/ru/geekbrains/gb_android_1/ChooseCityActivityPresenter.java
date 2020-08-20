@@ -13,10 +13,6 @@ public final class ChooseCityActivityPresenter {
     // Поле для синхронизации
     private static final Object syncObj = new Object();
 
-//    private static String[] citiesArray;
-//    private static ArrayAdapter<String> citiesListAdapter;
-//    private static List<String> citiesList;
-
     // Конструктор (вызывать извне его нельзя, поэтому он приватный)
     private ChooseCityActivityPresenter(){}
 
@@ -35,14 +31,12 @@ public final class ChooseCityActivityPresenter {
 
     public void updateWeatherInLandscape(CurrentDataContainer container,
                                          androidx.fragment.app.FragmentManager fragmentManager) {
-        WeatherMainFragment weatherMainFragment = (WeatherMainFragment) fragmentManager.findFragmentById(R.id.weatherMain);
-//       if(weatherMainFragment == null || !weatherMainFragment.getCityName().equals(ChooseCityFragment.currentCity)) { //*************************
+        WeatherMainFragment weatherMainFragment;
            Log.d(myLog, "ChooseCityFragment update updateWeatherInLandscape");
            weatherMainFragment = WeatherMainFragment.create(container);
            // Выполняем транзакцию по замене фрагмента
            FragmentTransaction ft = fragmentManager.beginTransaction();
            ft.replace(R.id.weatherMain, weatherMainFragment);  // замена фрагмента
-
            // можно добавить анимацию + добавить фрагмент в бэкстек:
            // ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
            // ft.addToBackStack(null);
@@ -50,6 +44,5 @@ public final class ChooseCityActivityPresenter {
            ft.commit();
        }
     }
-//} //***************************
 
 

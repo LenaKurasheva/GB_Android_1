@@ -72,10 +72,11 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
                 @Override
                 public void onClick(View view) {
                     if(onItemClickCallback != null) {
-                        onItemClickCallback.onItemClicked(day);
+                        onItemClickCallback.onItemClicked(view, day);
                     }
                 }
             });
+
         }
     }
 }

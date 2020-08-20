@@ -20,12 +20,13 @@
     <string name="HintTextInputEditText">Введите название города.</string>
     <string name="setOnBtnOkEnterCityToast">Некорректное имя города</string>
     <string name="toDeleteCity">Чтобы удалить город, нажмите</string>
-    <string name="delete">Удалить</string>
     <string name="cityDeleted">Город удален</string>
     <string name="pleaseChooseCotyFirst">Пожалуйста, сначала выберите город</string>
     <string name="about">О приложении</string>
     <string name="appName">Погода</string>
     <string name="version">Версия 1.0 17.08.2020</string>
+    <string name="delete_city">Удалить город?</string>
+    <string name="delete">Удалить</string>
     <string-array name="cities">
         <item>Москва</item>
         <item>Санкт-Петербург</item>
