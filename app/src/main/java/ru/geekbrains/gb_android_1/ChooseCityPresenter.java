@@ -121,13 +121,11 @@ public final class ChooseCityPresenter {
                 e.printStackTrace();
             }
         }
-
         try {
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return rawData.toString();
     }
 
@@ -137,8 +135,8 @@ public final class ChooseCityPresenter {
             String degrees = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getMain().getTemp()));
             String windInfo = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getWind().getSpeed()));
             String pressure = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getPressure());
-//            String weatherStateInfo = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(i).getDescription());
-            String weatherStateInfo = "Cloudy";
+            String weatherStateInfo = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(0).getDescription());
+//            String weatherStateInfo = "Cloudy";
             String feelLike = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getFeelsLike());
 //            String weatherIcon = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(i).getId());
             String weatherIcon = "cloudy_icon";
