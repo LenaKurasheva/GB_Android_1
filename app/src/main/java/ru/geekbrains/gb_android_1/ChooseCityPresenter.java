@@ -36,6 +36,7 @@ public final class ChooseCityPresenter {
     // Поле для синхронизации
     private static final Object syncObj = new Object();
     private ArrayList<WeatherData> weekWeatherData;
+    public static int responseCode;
 
     // Конструктор (вызывать извне его нельзя, поэтому он приватный)
     private ChooseCityPresenter(){}
@@ -77,6 +78,7 @@ public final class ChooseCityPresenter {
                    HttpsURLConnection urlConnection = null;
                    try {
                        urlConnection = (HttpsURLConnection) uri.openConnection();
+                       responseCode = urlConnection.getResponseCode();
                        urlConnection.setRequestMethod("GET"); // установка метода получения данных -GET
                        urlConnection.setReadTimeout(10000); // установка таймаута - 10 000 миллисекунд
                        BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream())); // читаем  данные в поток

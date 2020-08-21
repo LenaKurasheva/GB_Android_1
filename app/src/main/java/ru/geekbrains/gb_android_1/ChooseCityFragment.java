@@ -164,7 +164,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                     //Создаем прогноз погоды на неделю для нового выбранного города:
                     takeWeatherInfoForFiveDays();
                     Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag -> weatherCreated: " + weatherCreated);
-                    weatherCreated = true;
 
                     //Добавляем новый город в RV
                     adapter.addNewCity(currentCity);
@@ -272,7 +271,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         //Создаем прогноз погоды на неделю для нового выбранного города:
         takeWeatherInfoForFiveDays();
         Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag -> weatherCreated: " + weatherCreated);
-        weatherCreated = true;
 
         //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
         updateWeatherData();
@@ -295,7 +293,12 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     private void takeWeatherInfoForFiveDays(){
         chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources(), getActivity());
-        this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+        if(ChooseCityPresenter.responseCode == 200) {
+            this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+            weatherCreated = true;
+        } else {
+            Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setupRecyclerView() {
