@@ -2,6 +2,8 @@ package ru.geekbrains.gb_android_1;
 
 import android.content.res.Resources;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class WeatherData implements Serializable {
@@ -52,6 +54,18 @@ public class WeatherData implements Serializable {
 
         String[] weatherIconsFromRes = resources.getStringArray(R.array.iconsId);
         weatherIcon = weatherIconsFromRes[weatherStateIndex];
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        String weatherData = " - WEATHER DATA: degrees = " + degrees +
+                " windInfo = " + windInfo +
+                " pressure = " + pressure +
+                " weatherStateInfo = " + weatherStateInfo +
+                " feelLike = " + feelLike +
+                " weatherIcon = " + weatherIcon;
+        return weatherData;
     }
 
     private void calculateRandomValues(){

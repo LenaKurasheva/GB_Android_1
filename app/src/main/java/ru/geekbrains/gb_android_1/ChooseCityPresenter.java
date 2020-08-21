@@ -73,41 +73,40 @@ public final class ChooseCityPresenter {
        public void getFiveDaysWeatherFromServer(String currentCity, Resources resources, Context context){
            try {
                final URL uri = getWeatherUrl(currentCity);
-               final Handler handler = new Handler(); // Запоминаем основной поток
-               new Thread(() -> {
+               Thread t1 = new Thread(() -> {
                    HttpsURLConnection urlConnection = null;
                    try {
                        urlConnection = (HttpsURLConnection) uri.openConnection();
-                       responseCode = urlConnection.getResponseCode();
                        urlConnection.setRequestMethod("GET"); // установка метода получения данных -GET
                        urlConnection.setReadTimeout(10000); // установка таймаута - 10 000 миллисекунд
+                       responseCode = urlConnection.getResponseCode();
+                       Log.d(myLog, "###getFiveDaysWeatherFromServer responseCod = " + responseCode);
+                       Log.d(myLog, "###getFiveDaysWeatherFromServer currentCity = " + currentCity);
                        BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream())); // читаем  данные в поток
                        String result = getLines(in);
                        // преобразование данных запроса в модель
                        Gson gson = new Gson();
                        final WeatherRequest weatherRequest = gson.fromJson(result, WeatherRequest.class);
-                       // Возвращаемся к основному потоку
-                       handler.post(() -> {
-                           getWeatherData(weatherRequest, resources);
-                           Log.d(myLog, "ChooseCityPresenter - getFiveDaysWeatherFromServer - getWeatherData ");
-                       });
+                       getWeatherData(weatherRequest, resources);
+                       Log.d(myLog, "ChooseCityPresenter - getFiveDaysWeatherFromServer - getWeatherData ");
                    } catch (Exception e) {
                        Log.e(TAG, "Fail connection", e);
                        e.printStackTrace();
-                       Looper.prepare();//Call looper.prepare()
-                       showToast(context, "Fail internet connection");
-                       Looper.loop();
+//                       Looper.prepare();//Call looper.prepare()
+////                       showToast(context, "Fail internet connection");
+//                       Looper.loop();
                    } finally {
                        if (null != urlConnection) {
                            urlConnection.disconnect();
                        }
                    }
-               }).start();
+               });
+               t1.start();
+               t1.join();
            } catch (MalformedURLException e) {
                Log.e(TAG, "Fail URI", e);
-               Looper.prepare();//Call looper.prepare()
-               showToast(context, "City not exists");
-               Looper.loop();
+               e.printStackTrace();
+           } catch (InterruptedException e) {
                e.printStackTrace();
            }
        }
@@ -155,8 +154,8 @@ public final class ChooseCityPresenter {
 //            String weatherIcon = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(i).getId());
             String weatherIcon = "cloudy_icon";
             WeatherData weatherData = new WeatherData(resources, degrees, windInfo, pressure, weatherStateInfo, feelLike, weatherIcon);
-            weekWeatherData.add(weatherData);
-            Log.d(myLog, "WEATHER FIRS DAY " + weatherData.degrees +" " + weatherData.feelLike);
+            weekWeatherData.add(i, weatherData);
+            Log.d(myLog, i + weatherData.toString());
         }
     }
 }
