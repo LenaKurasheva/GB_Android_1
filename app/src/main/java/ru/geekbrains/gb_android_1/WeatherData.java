@@ -1,6 +1,7 @@
 package ru.geekbrains.gb_android_1;
 
 import android.content.res.Resources;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -19,7 +20,12 @@ public class WeatherData implements Serializable {
     int pressureRandom;
 
     public WeatherData(Resources resources, String degrees, String windInfo, String pressure, String weatherStateInfo, String feelLike, String weatherIcon){
-        this.degrees = "+" + degrees + "°";
+        String tempSign;
+        float t = Float.parseFloat(degrees.trim());
+        Log.d("myLog", "Degrees float from internet = " + t);
+        if(t > 0) {tempSign = "+";} else {tempSign = "";}
+        String stringTemperature = String.valueOf(Math.round(t));
+        this.degrees = tempSign + stringTemperature +  "°";
 
         String windInfoFromRes = resources.getString(R.string.windInfo);
         this.windInfo = String.format(windInfoFromRes, windInfo);
@@ -30,17 +36,23 @@ public class WeatherData implements Serializable {
         this.weatherStateInfo = weatherStateInfo;
 
         String feelsLikeInfoFromRes = resources.getString(R.string.feels_like_temp);
-        this.feelLike = String.format(feelsLikeInfoFromRes, (feelLike));
+        String sign;
+        float f = Float.parseFloat(feelLike.trim());
+        Log.d("myLog", "FeelsLike float from internet = " + f);
+        if(f > 0) {sign = "+";} else {sign = "";}
+        String stringFeelLike = String.valueOf(Math.round(f));
+        this.feelLike = String.format(feelsLikeInfoFromRes, sign, stringFeelLike);
 
         this.weatherIcon = weatherIcon;
     }
 
+    // Контруктор для создания рандомных данных погоды:
     public WeatherData(Resources resources){
         calculateRandomValues();
         degrees = "+" + tempRandom + "°";
 
         String feelsLikeInfoFromRes = resources.getString(R.string.feels_like_temp);
-        feelLike = String.format(feelsLikeInfoFromRes, (String.valueOf(tempRandom - 2)));
+        feelLike = String.format(feelsLikeInfoFromRes, "+", (String.valueOf(tempRandom - 2)));
 
         String pressureInfoFromRes = resources.getString(R.string.pressureInfo);
         pressure = String.format(pressureInfoFromRes, String.valueOf(pressureRandom));
