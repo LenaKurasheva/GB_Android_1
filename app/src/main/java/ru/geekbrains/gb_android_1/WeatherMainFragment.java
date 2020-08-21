@@ -27,6 +27,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -107,7 +108,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         setOnSettingsBtnOnClick();
         setOnReadMoreBtnOnClick();
         takeCitiesListFromResources(getResources());
-        takeDaysListFromResources(getResources());
+        generateDaysList();
         addDataToWeatherIconsIdFromRes();
         addDefaultDataToDaysTempFromRes(getResources());
         updateWeatherInfo(getResources()); //здесь забрали citiesList
@@ -287,7 +288,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             windInfoTextView.setText (String.format(windInfoFromRes, "0"));
 
             Date currentDate = new Date();
-            DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
             String timeText = timeFormat.format(currentDate);
             currTime.setText(timeText);
 
@@ -347,7 +348,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             windInfoTextView.setText(wd.windInfo);
 
             Date currentDate = new Date();
-            DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
             String timeText = timeFormat.format(currentDate);
             currTime.setText(timeText);
 
@@ -372,9 +373,27 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         citiesListFromRes = new ArrayList<>(cit);
     }
 
-    public void takeDaysListFromResources(android.content.res.Resources resources){
-            String[] daysStringArr = resources.getStringArray(R.array.days);
-            days = Arrays.asList(daysStringArr);
+    public void generateDaysList(){
+        Date currentDate = new Date();
+        DateFormat timeFormat = new SimpleDateFormat("E", Locale.getDefault());
+        String curDay = timeFormat.format(currentDate);
+        Log.d(myLog, "CURDAY = " + curDay);
+        ArrayList<String> daysList = new ArrayList<>();
+        daysList.add(curDay);
+        for (int i = 1; i <ChooseCityPresenter.FORECAST_DAYS ; i++) {
+            Calendar instance = Calendar.getInstance(Locale.getDefault());
+            instance.add(Calendar.DAY_OF_MONTH, i); // прибавляем 1 день к установленной дате
+            Date nextDate = instance.getTime(); // получаем измененную дату
+            String nextDay = timeFormat.format(nextDate);
+            daysList.add(nextDay);
+        }
+        Log.d(myLog, "WEEK: "+ daysList.toString());
+        days = daysList;
+
+
+
+
+
     }
 
     public void addDefaultDataToDaysTempFromRes(android.content.res.Resources resources){

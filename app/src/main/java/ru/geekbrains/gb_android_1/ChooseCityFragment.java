@@ -323,7 +323,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     }
 
     private void takeWeatherInfoForFiveDays(){
-        chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources(), getActivity());
+        chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources());
     }
 
     private void setupRecyclerView() {

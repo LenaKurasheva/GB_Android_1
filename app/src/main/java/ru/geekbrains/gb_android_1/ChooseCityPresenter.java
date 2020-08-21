@@ -1,11 +1,7 @@
 package ru.geekbrains.gb_android_1;
 
-import android.content.Context;
 import android.content.res.Resources;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.fragment.app.FragmentTransaction;
 
@@ -70,7 +66,7 @@ public final class ChooseCityPresenter {
            ft.commit();
        }
 
-       public void getFiveDaysWeatherFromServer(String currentCity, Resources resources, Context context){
+       public void getFiveDaysWeatherFromServer(String currentCity, Resources resources){
            try {
                final URL uri = getWeatherUrl(currentCity);
                Thread t1 = new Thread(() -> {
@@ -92,9 +88,6 @@ public final class ChooseCityPresenter {
                    } catch (Exception e) {
                        Log.e(TAG, "Fail connection", e);
                        e.printStackTrace();
-//                       Looper.prepare();//Call looper.prepare()
-////                       showToast(context, "Fail internet connection");
-//                       Looper.loop();
                    } finally {
                        if (null != urlConnection) {
                            urlConnection.disconnect();
@@ -136,10 +129,6 @@ public final class ChooseCityPresenter {
         }
 
         return rawData.toString();
-    }
-
-    public void showToast(Context context, String text){
-        Toast.makeText(context, text, Toast.LENGTH_LONG).show();
     }
 
     public void getWeatherData(WeatherRequest weatherRequest, Resources resources){
