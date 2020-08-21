@@ -126,13 +126,24 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 == Configuration.ORIENTATION_LANDSCAPE;
         // Если можно нарисовать рядом выбор города, то сделаем это
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !BEFORE updateChosenCity, currentCity: " + currentCity);
+        if (isLandscape) showChooseCityFragment(getCurrentDataContainer());
 
-        if (isLandscape) {
-            showChooseCityFragment(getCurrentDataContainer());
-        }
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
         updateChosenCity(savedInstanceState);
+        takeWeatherInfoForFirstEnter();
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
+    }
+
+    private void takeWeatherInfoForFirstEnter(){
+        if(CurrentDataContainer.isFirstEnter){
+            Log.d(myLog, "*FIRST ENTER*");
+            ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
+            chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources());
+            this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+            updateWeatherInfo(getResources());
+            setupRecyclerView();
+            CurrentDataContainer.isFirstEnter = false;
+        }
     }
 
     private void moveViewsIfLandscapeOrientation( View view){
@@ -236,7 +247,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 weekWeatherData = cdc.weekWeatherData;
                 if (weekWeatherData != null && weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
             }
-
             CurrentDataContainer.NightIsAlreadySettedInMain = false;
         } else {
             if (getArguments() != null && getArguments().getSerializable("currCity") != null) {
@@ -246,7 +256,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                     weekWeatherData = currentCityContainer.weekWeatherData;
                     if (weekWeatherData != null && weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
                 }
-
                 Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); else; currentCityContainer != null");
             }
         }
@@ -281,19 +290,26 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private  void updateWeatherInfo(Resources resources){
-            Log.d(myLog, "updateWeatherInfo from resources" );
-            degrees.setText("+0°");
+        if(CurrentDataContainer.isFirstEnter) {
+            if(ChooseCityPresenter.responseCode != 200) {
+                Log.d(myLog, "updateWeatherInfo from resources");
 
-            String windInfoFromRes = resources.getString(R.string.windInfo);
-            windInfoTextView.setText (String.format(windInfoFromRes, "0"));
+                degrees.setText("+0°");
 
-            Date currentDate = new Date();
-            DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
-            String timeText = timeFormat.format(currentDate);
-            currTime.setText(timeText);
+                String windInfoFromRes = resources.getString(R.string.windInfo);
+                windInfoTextView.setText(String.format(windInfoFromRes, "0"));
 
-        this.citiesList = citiesListFromRes;
-        Log.d(myLog, "WeathrMainFragment - updateWeatherInfo - take ciiesListFromGes: " + citiesList.toString());
+                Date currentDate = new Date();
+                DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
+                String timeText = timeFormat.format(currentDate);
+                currTime.setText(timeText);
+
+                this.citiesList = citiesListFromRes;
+                Log.d(myLog, "WeathrMainFragment - updateWeatherInfo - take ciiesListFromGes: " + citiesList.toString());
+            } else {
+                setNewWeatherData(weekWeatherData);
+            }
+        }
 
         boolean[] settingsSwitchArray;
         if (getArguments() != null) {
@@ -321,7 +337,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 }
             }
         }
-
     }
 
     private void isSettingsSwitchArrayTransferred(boolean[] settingsSwitchArray){
