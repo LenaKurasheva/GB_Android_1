@@ -389,11 +389,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
         Log.d(myLog, "WEEK: "+ daysList.toString());
         days = daysList;
-
-
-
-
-
     }
 
     public void addDefaultDataToDaysTempFromRes(android.content.res.Resources resources){
@@ -402,15 +397,16 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     public void addDataToWeatherIconsIdFromRes(){
-        weatherIcon.add(R.drawable.cloudy_icon);
-        weatherIcon.add(R.drawable.little_cloudy_sunny);
-        weatherIcon.add(R.drawable.sunny_not_cloudy);
-        weatherIcon.add(R.drawable.little_cloudy_sunny);
-        weatherIcon.add(R.drawable.cloudy_rainy_not_windy);
-        weatherIcon.add(R.drawable.cloudy_very_rainy_and_windy);
-        weatherIcon.add(R.drawable.storm_cloudy);
+        weatherIcon.add(R.drawable.clear_sky_day);
+        weatherIcon.add(R.drawable.few_clouds_day);
+        weatherIcon.add(R.drawable.scattered_clouds);
+        weatherIcon.add(R.drawable.broken_clouds);
+        weatherIcon.add(R.drawable.shower_rain);
+        weatherIcon.add(R.drawable.rain_day);
+        weatherIcon.add(R.drawable.thunderstorm);
+        weatherIcon.add(R.drawable.snow);
+        weatherIcon.add(R.drawable.mist);
     }
-
 
     @Override
     public void onItemClicked(View view, String itemText) {

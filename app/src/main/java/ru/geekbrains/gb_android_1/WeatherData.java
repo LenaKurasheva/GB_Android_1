@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import java.io.Serializable;
 
 public class WeatherData implements Serializable {
-    private final float pressureHpaToMmHgDivider = 1.33322387415f;
     String degrees;
     String windInfo;
     String pressure;
@@ -20,7 +19,7 @@ public class WeatherData implements Serializable {
     int windRandom;
     int pressureRandom;
 
-    public WeatherData(Resources resources, String degrees, String windInfo, String pressure, String weatherStateInfo, String feelLike, String weatherIcon){
+    public WeatherData(Resources resources, String degrees, String windInfo, String pressure, String weatherStateInfo, String feelLike, int weatherIcon){
         String tempSign;
         float t = Float.parseFloat(degrees.trim());
         Log.d("myLog", "Degrees float from internet = " + t);
@@ -33,6 +32,7 @@ public class WeatherData implements Serializable {
 
         String pressureInfoFromRes = resources.getString(R.string.pressureInfo);
         float p = Float.parseFloat(pressure.trim());
+        float pressureHpaToMmHgDivider = 1.33322387415f;
         float pressureInMmHg = (float) (p / pressureHpaToMmHgDivider);
         String stringPressure = String.valueOf(Math.round(pressureInMmHg));
         this.pressure = String.format(pressureInfoFromRes, stringPressure);
@@ -47,7 +47,7 @@ public class WeatherData implements Serializable {
         String stringFeelLike = String.valueOf(Math.round(f));
         this.feelLike = String.format(feelsLikeInfoFromRes, sign, stringFeelLike);
 
-        this.weatherIcon = weatherIcon;
+        findIconById(weatherIcon);
     }
 
     // Контруктор для создания рандомных данных погоды:
@@ -75,13 +75,42 @@ public class WeatherData implements Serializable {
     @NonNull
     @Override
     public String toString() {
-        String weatherData = " - WEATHER DATA: degrees = " + degrees +
+        return " - WEATHER DATA: degrees = " + degrees +
                 " windInfo = " + windInfo +
                 " pressure = " + pressure +
                 " weatherStateInfo = " + weatherStateInfo +
                 " feelLike = " + feelLike +
                 " weatherIcon = " + weatherIcon;
-        return weatherData;
+    }
+
+    private void findIconById(int weatherIcon){
+        if(weatherIcon >= 200 && weatherIcon <= 232){
+            this.weatherIcon = "thunderstorm";
+        }
+        if(weatherIcon >= 300 && weatherIcon <= 321){
+            this.weatherIcon = "shower_rain";
+        }
+        if(weatherIcon >= 500 && weatherIcon <= 531){
+            this.weatherIcon = "rain_day";
+        }
+        if(weatherIcon >= 600 && weatherIcon <= 622){
+            this.weatherIcon = "snow";
+        }
+        if(weatherIcon >= 700 && weatherIcon <= 781){
+            this.weatherIcon = "mist";
+        }
+        if(weatherIcon == 800){
+            this.weatherIcon = "clear_sky_day";
+        }
+        if(weatherIcon == 801){
+            this.weatherIcon = "few_clouds_day";
+        }
+        if(weatherIcon == 802){
+            this.weatherIcon = "scattered_clouds";
+        }
+        if(weatherIcon == 803 || weatherIcon == 804 ){
+            this.weatherIcon = "broken_clouds";
+        }
     }
 
     private void calculateRandomValues(){

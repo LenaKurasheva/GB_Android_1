@@ -137,8 +137,9 @@ public final class ChooseCityPresenter {
             String pressure = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getPressure());
             String weatherStateInfo = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(0).getDescription());
             String feelLike = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getFeelsLike());
-//            String weatherIcon = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(i).getId());
-            String weatherIcon = "cloudy_icon";
+//            String weatherIcon = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(0).getId());
+            int weatherIcon = weatherRequest.getList().get(i).getWeather().get(0).getId();
+//            String weatherIcon = "cloudy_icon";
             WeatherData weatherData = new WeatherData(resources, degrees, windInfo, pressure, weatherStateInfo, feelLike, weatherIcon);
             weekWeatherData.add(i, weatherData);
             Log.d(myLog, i + weatherData.toString());
