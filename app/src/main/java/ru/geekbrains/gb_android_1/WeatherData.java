@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import java.io.Serializable;
 
 public class WeatherData implements Serializable {
+    private final float pressureHpaToMmHgDivider = 1.33322387415f;
     String degrees;
     String windInfo;
     String pressure;
@@ -31,7 +32,10 @@ public class WeatherData implements Serializable {
         this.windInfo = String.format(windInfoFromRes, windInfo);
 
         String pressureInfoFromRes = resources.getString(R.string.pressureInfo);
-        this.pressure = String.format(pressureInfoFromRes, pressure);
+        float p = Float.parseFloat(pressure.trim());
+        float pressureInMmHg = (float) (p / pressureHpaToMmHgDivider);
+        String stringPressure = String.valueOf(Math.round(pressureInMmHg));
+        this.pressure = String.format(pressureInfoFromRes, stringPressure);
 
         this.weatherStateInfo = weatherStateInfo;
 

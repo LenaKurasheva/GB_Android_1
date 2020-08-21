@@ -11,7 +11,7 @@
     <string name="set_on_night_mode">Set on night mode</string>
     <string name="show_atmosphere_pressure">Show atmosphere pressure</string>
     <string name="windInfo">wind %1$s m/s</string>
-    <string name="pressureInfo">%1$s mm</string>
+    <string name="pressureInfo">%1$s mm Hg</string>
     <string name="or_choose_from_list">Or choose from list.</string>
     <string name="currTime">11:33</string>
     <string name="show_temperature_feels_like">Show temperature feels like</string>
