@@ -130,7 +130,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
         updateChosenCity(savedInstanceState);
-        takeWeatherInfoForFirstEnter();
+//        takeWeatherInfoForFirstEnter();
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
     }
 
@@ -141,8 +141,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources());
             this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
             updateWeatherInfo(getResources());
+            Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
             setupRecyclerView();
             CurrentDataContainer.isFirstEnter = false;
+        } else {
+            Log.d(myLog, "*NOT FIRST ENTER*");
         }
     }
 
@@ -236,6 +239,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         CurrentDataContainer container = new CurrentDataContainer();
         container.currCityName = currentCity;
         container.citiesList = this.citiesList;
+        Log.d(myLog, "WeatherMainFragment - getCurrentDataContainer() - положили в citiesList:" + this.citiesList.toString());
         if (!isLandscape) {
             CurrentDataContainer cdc = (CurrentDataContainer) Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity");
             if(cdc != null) {
@@ -305,9 +309,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 currTime.setText(timeText);
 
                 this.citiesList = citiesListFromRes;
-                Log.d(myLog, "WeathrMainFragment - updateWeatherInfo - take ciiesListFromGes: " + citiesList.toString());
+                Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
+//                this.citiesList = citiesListFromRes;
                 setNewWeatherData(weekWeatherData);
+                Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode == 200; CITIES LIST = " + citiesList.toString());
             }
         }
 
@@ -320,14 +326,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 weekWeatherData = currentDataContainer.weekWeatherData;
                 citiesList = currentDataContainer.citiesList;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
-                if(weekWeatherData != null)Log.d(myLog, "updateWeatherInfo from Arguments; curr temp = "+weekWeatherData.get(0).degrees);
+                if(weekWeatherData != null)Log.d(myLog, "WeatherMainFragment - updateWeatherInfo -> from Arguments; curr temp = "+weekWeatherData.get(0).degrees);
                 setNewWeatherData(weekWeatherData);
             }
         } else {
             if (Objects.requireNonNull(getActivity()).getIntent() != null) {
                 CurrentDataContainer cdc = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
                 if (cdc != null) {
-                    Log.d(myLog, "updateWeatherInfo from Intent");
+                    Log.d(myLog, "WeatherMainFragment - updateWeatherInfo -> from Intent");
                     currentCity = cdc.currCityName;
                     settingsSwitchArray = cdc.switchSettingsArray;
                     weekWeatherData = cdc.weekWeatherData;

@@ -246,7 +246,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
 //    private void updateCitiesList() {
     private void takeCitiesList(){
-        Log.d(myLog, "ChooseCityFragment - takeCitiesList() ");
         if (!isLandscape) {
             Log.d(myLog, "ChooseCityFragment; updateCitiesList; !isLandscape");
             if(Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity") != null) {
@@ -274,6 +273,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 }
             }
         }
+        Log.d(myLog, "ChooseCityFragment - takeCitiesList() " + citiesList.toString());
     }
 
     // Обработчик нажатий на город из списка RV
