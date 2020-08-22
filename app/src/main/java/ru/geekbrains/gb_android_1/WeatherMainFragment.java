@@ -61,7 +61,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         fragment.setArguments(args);
         Log.d("myLog", "WeatherMainFragment CREATE");
         return fragment;
-
     }
 
     @Override
@@ -86,7 +85,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
             }
         }
-
         super.onCreate(savedInstanceState);
     }
 
@@ -130,7 +128,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
         updateChosenCity(savedInstanceState);
-//        takeWeatherInfoForFirstEnter();
+        takeWeatherInfoForFirstEnter();
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
     }
 
@@ -143,7 +141,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             updateWeatherInfo(getResources());
             Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
             setupRecyclerView();
-            CurrentDataContainer.isFirstEnter = false;
         } else {
             Log.d(myLog, "*NOT FIRST ENTER*");
         }
@@ -294,6 +291,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private  void updateWeatherInfo(Resources resources){
+        this.citiesList = citiesListFromRes;
         if(CurrentDataContainer.isFirstEnter) {
             if(ChooseCityPresenter.responseCode != 200) {
                 Log.d(myLog, "updateWeatherInfo from resources");
@@ -307,11 +305,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
                 String timeText = timeFormat.format(currentDate);
                 currTime.setText(timeText);
-
-                this.citiesList = citiesListFromRes;
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
-//                this.citiesList = citiesListFromRes;
                 setNewWeatherData(weekWeatherData);
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode == 200; CITIES LIST = " + citiesList.toString());
             }
