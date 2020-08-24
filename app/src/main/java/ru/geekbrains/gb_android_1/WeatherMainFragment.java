@@ -345,7 +345,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         Log.d(myLog, "NightMode " + CurrentDataContainer.isNightModeOn);
         if(settingsSwitchArray != null) {
             if (settingsSwitchArray[0] && !CurrentDataContainer.NightIsAlreadySettedInMain) {
-                //TODO
                 CurrentDataContainer.NightIsAlreadySettedInMain = true;
                 CurrentDataContainer.isNightModeOn = true;
                 Objects.requireNonNull(getActivity()).recreate();
