@@ -44,7 +44,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     private ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
     final String myLog = "myLog";
     private boolean isLandscape;
-    ChooseCityActivityPresenter chooseCityActivityPresenter = ChooseCityActivityPresenter.getInstance();
+    ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
     private boolean isErrorShown;
     // Паттерн для проверки, является ли введеное слово названием города.
     Pattern checkEnterCity = Pattern.compile("^[а-яА-ЯЁa-zA-Z]+(?:[\\s-][а-яА-ЯЁa-zA-Z]+)*$");
@@ -161,10 +161,26 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 enterCity.setEnabled(true);
                 if (!Objects.requireNonNull(enterCity.getText()).toString().equals("")) {
                     currentCity = enterCity.getText().toString();
+
                     //Создаем прогноз погоды на неделю для нового выбранного города:
-                    createRandomWeekWeatherData();
+                    takeWeatherInfoForFiveDays();
+                    if (ChooseCityPresenter.responseCode == 404) {
+                        Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+                        Toast.makeText(getContext(), "City not found", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    if(ChooseCityPresenter.responseCode == 200) {
+                        Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+
+                        this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+                        weatherCreated = true;
+                    } if (ChooseCityPresenter.responseCode != 200 ){
+                        Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+
+                        Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag -> weatherCreated: " + weatherCreated);
-                    weatherCreated = true;
 
                     //Добавляем новый город в RV
                     adapter.addNewCity(currentCity);
@@ -181,7 +197,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     private void updateWeatherData(){
         if(isLandscape) {
-            chooseCityActivityPresenter.updateWeatherInLandscape(getCurrentDataContainer(), Objects.requireNonNull(getFragmentManager()));
+            chooseCityPresenter.updateWeatherInLandscape(getCurrentDataContainer(), Objects.requireNonNull(getFragmentManager()));
         } else {
             Intent intent = new Intent();
             intent.setClass(Objects.requireNonNull(getActivity()), MainActivity.class);
@@ -230,7 +246,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
 //    private void updateCitiesList() {
     private void takeCitiesList(){
-        Log.d(myLog, "ChooseCityFragment - takeCitiesList() ");
         if (!isLandscape) {
             Log.d(myLog, "ChooseCityFragment; updateCitiesList; !isLandscape");
             if(Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity") != null) {
@@ -258,6 +273,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 }
             }
         }
+        Log.d(myLog, "ChooseCityFragment - takeCitiesList() " + citiesList.toString());
     }
 
     // Обработчик нажатий на город из списка RV
@@ -270,9 +286,22 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         adapter.putChosenCityToTopInCitiesList(currentCity);
 
         //Создаем прогноз погоды на неделю для нового выбранного города:
-        createRandomWeekWeatherData();
+        takeWeatherInfoForFiveDays();
+        if (ChooseCityPresenter.responseCode == 404) {
+            Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+            Toast.makeText(getContext(), "City not found", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if(ChooseCityPresenter.responseCode == 200) {
+            Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+            this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+            weatherCreated = true;
+        } else {
+            Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+            Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
+            return;
+        }
         Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag -> weatherCreated: " + weatherCreated);
-        weatherCreated = true;
 
         //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
         updateWeatherData();
@@ -293,13 +322,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 }).show();
     }
 
-    private void createRandomWeekWeatherData(){
-        Log.d(myLog, "ChooseCityFragment - createRandomWeekWeatherData()");
-        ArrayList<WeatherData> weather = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            weather.add(new WeatherData(getResources()));
-        }
-        weekWeatherData = weather;
+    private void takeWeatherInfoForFiveDays(){
+        chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources());
+        CurrentDataContainer.isFirstEnter = false;
     }
 
     private void setupRecyclerView() {

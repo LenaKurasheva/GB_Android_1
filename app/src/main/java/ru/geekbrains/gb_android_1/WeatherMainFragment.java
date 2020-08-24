@@ -22,12 +22,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -43,7 +43,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     final String myLog = "myLog";
     private RecyclerView weatherRecyclerView;
     private List<Integer> weatherIcon = new ArrayList<>();
-    private ArrayList<String> weatherStateInfo = new ArrayList<>();
     private List<String> days = new ArrayList<>();
     private List<String> daysTemp = new ArrayList<>();
     private TextView windInfoTextView;
@@ -62,7 +61,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         fragment.setArguments(args);
         Log.d("myLog", "WeatherMainFragment CREATE");
         return fragment;
-
     }
 
     @Override
@@ -87,7 +85,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 Objects.requireNonNull(getActivity()).setTheme(R.style.AppTheme);
             }
         }
-
         super.onCreate(savedInstanceState);
     }
 
@@ -96,10 +93,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d("myLog", "onCreateView - fragment WeatherMainFragment");
-        View view = getView() != null ? getView() :
+        return getView() != null ? getView() :
                 inflater.inflate(R.layout.fragment_weather_main, container, false);
-        Toast.makeText(getContext(), "onCreateView", Toast.LENGTH_SHORT).show();
-        return view;
     }
 
     @Override
@@ -111,7 +106,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         setOnSettingsBtnOnClick();
         setOnReadMoreBtnOnClick();
         takeCitiesListFromResources(getResources());
-        takeDaysListFromResources(getResources());
+        generateDaysList();
         addDataToWeatherIconsIdFromRes();
         addDefaultDataToDaysTempFromRes(getResources());
         updateWeatherInfo(getResources()); //здесь забрали citiesList
@@ -129,13 +124,26 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 == Configuration.ORIENTATION_LANDSCAPE;
         // Если можно нарисовать рядом выбор города, то сделаем это
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !BEFORE updateChosenCity, currentCity: " + currentCity);
+        if (isLandscape) showChooseCityFragment(getCurrentDataContainer());
 
-        if (isLandscape) {
-            showChooseCityFragment(getCurrentDataContainer());
-        }
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
         updateChosenCity(savedInstanceState);
+        takeWeatherInfoForFirstEnter();
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
+    }
+
+    private void takeWeatherInfoForFirstEnter(){
+        if(CurrentDataContainer.isFirstEnter){
+            Log.d(myLog, "*FIRST ENTER*");
+            ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
+            chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources());
+            this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+            updateWeatherInfo(getResources());
+            Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
+            setupRecyclerView();
+        } else {
+            Log.d(myLog, "*NOT FIRST ENTER*");
+        }
     }
 
     private void moveViewsIfLandscapeOrientation( View view){
@@ -228,6 +236,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         CurrentDataContainer container = new CurrentDataContainer();
         container.currCityName = currentCity;
         container.citiesList = this.citiesList;
+        Log.d(myLog, "WeatherMainFragment - getCurrentDataContainer() - положили в citiesList:" + this.citiesList.toString());
         if (!isLandscape) {
             CurrentDataContainer cdc = (CurrentDataContainer) Objects.requireNonNull(getActivity()).getIntent().getSerializableExtra("currCity");
             if(cdc != null) {
@@ -237,9 +246,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                     Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); !isLandscape; switchSettingsArray != null");
                 }
                 weekWeatherData = cdc.weekWeatherData;
-                if (weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
+                if (weekWeatherData != null && weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
             }
-
             CurrentDataContainer.NightIsAlreadySettedInMain = false;
         } else {
             if (getArguments() != null && getArguments().getSerializable("currCity") != null) {
@@ -247,9 +255,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 if (currentCityContainer != null) {
                     container.switchSettingsArray = currentCityContainer.switchSettingsArray;
                     weekWeatherData = currentCityContainer.weekWeatherData;
-                    if (weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
+                    if (weekWeatherData != null && weekWeatherData.size() != 0) container.weekWeatherData = weekWeatherData;
                 }
-
                 Log.d(myLog, "CHOOSE CITY FRAGMENT: getCurrentDataContainer(); else; currentCityContainer != null");
             }
         }
@@ -281,23 +288,29 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private void updateChosenCity(Bundle savedInstanceState) {
         if (savedInstanceState == null) cityTextView.setText(getCityName());
         cityTextView.setText(currentCity);
-        Toast.makeText(getActivity(), "Update city to " + currentCity, Toast.LENGTH_LONG).show();
     }
 
     private  void updateWeatherInfo(Resources resources){
-            Log.d(myLog, "updateWeatherInfo from resources" );
-            degrees.setText("+0°");
-
-            String windInfoFromRes = resources.getString(R.string.windInfo);
-            windInfoTextView.setText (String.format(windInfoFromRes, 0));
-
-            Date currentDate = new Date();
-            DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            String timeText = timeFormat.format(currentDate);
-            currTime.setText(timeText);
-
         this.citiesList = citiesListFromRes;
-        Log.d(myLog, "WeathrMainFragment - updateWeatherInfo - take ciiesListFromGes: " + citiesList.toString());
+        if(CurrentDataContainer.isFirstEnter) {
+            if(ChooseCityPresenter.responseCode != 200) {
+                Log.d(myLog, "updateWeatherInfo from resources");
+
+                degrees.setText("+0°");
+
+                String windInfoFromRes = resources.getString(R.string.windInfo);
+                windInfoTextView.setText(String.format(windInfoFromRes, "0"));
+
+                Date currentDate = new Date();
+                DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
+                String timeText = timeFormat.format(currentDate);
+                currTime.setText(timeText);
+                Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
+            } else {
+                setNewWeatherData(weekWeatherData);
+                Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode == 200; CITIES LIST = " + citiesList.toString());
+            }
+        }
 
         boolean[] settingsSwitchArray;
         if (getArguments() != null) {
@@ -308,14 +321,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 weekWeatherData = currentDataContainer.weekWeatherData;
                 citiesList = currentDataContainer.citiesList;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
-                Log.d(myLog, "updateWeatherInfo from Arguments; curr temp = "+weekWeatherData.get(0).degrees);
+                if(weekWeatherData != null)Log.d(myLog, "WeatherMainFragment - updateWeatherInfo -> from Arguments; curr temp = "+weekWeatherData.get(0).degrees);
                 setNewWeatherData(weekWeatherData);
             }
         } else {
             if (Objects.requireNonNull(getActivity()).getIntent() != null) {
                 CurrentDataContainer cdc = (CurrentDataContainer) getActivity().getIntent().getSerializableExtra("currCity");
                 if (cdc != null) {
-                    Log.d(myLog, "updateWeatherInfo from Intent");
+                    Log.d(myLog, "WeatherMainFragment - updateWeatherInfo -> from Intent");
                     currentCity = cdc.currCityName;
                     settingsSwitchArray = cdc.switchSettingsArray;
                     weekWeatherData = cdc.weekWeatherData;
@@ -332,7 +345,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         Log.d(myLog, "NightMode " + CurrentDataContainer.isNightModeOn);
         if(settingsSwitchArray != null) {
             if (settingsSwitchArray[0] && !CurrentDataContainer.NightIsAlreadySettedInMain) {
-                //TODO
                 CurrentDataContainer.NightIsAlreadySettedInMain = true;
                 CurrentDataContainer.isNightModeOn = true;
                 Objects.requireNonNull(getActivity()).recreate();
@@ -344,14 +356,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
     }
 
-    private void setNewWeatherData(List<WeatherData> weekWeatherData) {
-        if (weekWeatherData.size() != 0) {
+    private void setNewWeatherData(ArrayList<WeatherData> weekWeatherData) {
+        if (weekWeatherData != null && weekWeatherData.size() != 0) {
             WeatherData wd = weekWeatherData.get(0);
             degrees.setText(wd.degrees);
             windInfoTextView.setText(wd.windInfo);
 
             Date currentDate = new Date();
-            DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
             String timeText = timeFormat.format(currentDate);
             currTime.setText(timeText);
 
@@ -359,10 +371,9 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             pressureInfoTextView.setText(wd.pressure);
             feelsLikeTextView.setText(wd.feelLike);
 
-            for (int i = 0; i < 7; i++) {
+            for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS; i++) {
                WeatherData weatherData = weekWeatherData.get(i);
                daysTemp.set(i, weatherData.degrees);
-               weatherStateInfo.add(i, weatherData.weatherStateInfo);
                 String imageName =weatherData.weatherIcon;
                 Log.d(myLog, "ICON " + i + " " +  imageName);
                 Integer resID = getResources().getIdentifier(imageName , "drawable", Objects.requireNonNull(getActivity()).getPackageName());
@@ -377,9 +388,22 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         citiesListFromRes = new ArrayList<>(cit);
     }
 
-    public void takeDaysListFromResources(android.content.res.Resources resources){
-            String[] daysStringArr = resources.getStringArray(R.array.days);
-            days = Arrays.asList(daysStringArr);
+    public void generateDaysList(){
+        Date currentDate = new Date();
+        DateFormat timeFormat = new SimpleDateFormat("E", Locale.getDefault());
+        String curDay = timeFormat.format(currentDate);
+        Log.d(myLog, "CURDAY = " + curDay);
+        ArrayList<String> daysList = new ArrayList<>();
+        daysList.add(curDay);
+        for (int i = 1; i <ChooseCityPresenter.FORECAST_DAYS ; i++) {
+            Calendar instance = Calendar.getInstance(Locale.getDefault());
+            instance.add(Calendar.DAY_OF_MONTH, i); // прибавляем 1 день к установленной дате
+            Date nextDate = instance.getTime(); // получаем измененную дату
+            String nextDay = timeFormat.format(nextDate);
+            daysList.add(nextDay);
+        }
+        Log.d(myLog, "WEEK: "+ daysList.toString());
+        days = daysList;
     }
 
     public void addDefaultDataToDaysTempFromRes(android.content.res.Resources resources){
@@ -388,15 +412,16 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     public void addDataToWeatherIconsIdFromRes(){
-        weatherIcon.add(R.drawable.cloudy_icon);
-        weatherIcon.add(R.drawable.little_cloudy_sunny);
-        weatherIcon.add(R.drawable.sunny_not_cloudy);
-        weatherIcon.add(R.drawable.little_cloudy_sunny);
-        weatherIcon.add(R.drawable.cloudy_rainy_not_windy);
-        weatherIcon.add(R.drawable.cloudy_very_rainy_and_windy);
-        weatherIcon.add(R.drawable.storm_cloudy);
+        weatherIcon.add(R.drawable.clear_sky_day);
+        weatherIcon.add(R.drawable.few_clouds_day);
+        weatherIcon.add(R.drawable.scattered_clouds);
+        weatherIcon.add(R.drawable.broken_clouds);
+        weatherIcon.add(R.drawable.shower_rain);
+        weatherIcon.add(R.drawable.rain_day);
+        weatherIcon.add(R.drawable.thunderstorm);
+        weatherIcon.add(R.drawable.snow);
+        weatherIcon.add(R.drawable.mist);
     }
-
 
     @Override
     public void onItemClicked(View view, String itemText) {
